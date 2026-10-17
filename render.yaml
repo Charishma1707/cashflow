@@ -1,5 +1,5 @@
 services:
-  # 1. Backend Web Service (Free Tier)
+  # Backend: Node.js Express API
   - type: web
     name: cashflow-copilot-api
     runtime: node
@@ -10,8 +10,6 @@ services:
     envVars:
       - key: NODE_ENV
         value: production
-      - key: PORT
-        value: 5000
       - key: MONGODB_URI
         sync: false
       - key: CLIENT_URL
@@ -23,11 +21,10 @@ services:
       - key: PAYPAL_BASE_URL
         value: https://api-m.sandbox.paypal.com
 
-  # 2. Frontend Static Site (Free Tier)
+  # Frontend: React static site
   - type: web
     name: cashflow-copilot-client
     runtime: static
-    plan: free
     rootDir: client
     buildCommand: npm install && npm run build
     staticPublishPath: dist
