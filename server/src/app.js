@@ -38,6 +38,25 @@ if (process.env.NODE_ENV !== 'test') {
   app.use(morgan('dev'));
 }
 
+// Root API Welcome
+app.get('/', (req, res) => {
+  res.json({
+    app: 'CashFlow Copilot API',
+    status: 'online',
+    version: '1.0.0',
+    documentation: 'https://github.com/Charishma1707/cashflow',
+    endpoints: {
+      health: '/api/health',
+      dashboard: '/api/dashboard',
+      invoices: '/api/invoices',
+      expenses: '/api/expenses',
+      payments: '/api/payments',
+      business: '/api/business',
+      paypalStatus: '/api/paypal/status',
+    },
+  });
+});
+
 // Health check
 app.get('/api/health', (req, res) => {
   res.json({
