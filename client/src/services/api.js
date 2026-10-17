@@ -1,7 +1,18 @@
 import axios from 'axios';
 
+const getBaseUrl = () => {
+  if (import.meta.env.VITE_API_BASE_URL?.trim()) {
+    return import.meta.env.VITE_API_BASE_URL.trim();
+  }
+  // Auto-connect to Render backend when deployed on onrender.com
+  if (typeof window !== 'undefined' && window.location.hostname.includes('onrender.com')) {
+    return 'https://cashflow-copilot-api.onrender.com/api';
+  }
+  return '/api';
+};
+
 const api = axios.create({
-  baseURL: import.meta.env.VITE_API_BASE_URL || '/api',
+  baseURL: getBaseUrl(),
   headers: {
     'Content-Type': 'application/json',
   },
@@ -22,7 +33,10 @@ export const formatMoney = (cents, currency = 'USD') => {
 // Dashboard API
 export const getDashboardSummary = async () => {
   const res = await api.get('/dashboard');
-  return res.data.data;
+  if (typeof res.data === 'string' && res.data.includes('<!doctype html>')) {
+    throw new Error('API returned HTML instead of JSON. Ensure backend URL is active.');
+  }
+  return res.data?.data;
 };
 
 // Invoices API

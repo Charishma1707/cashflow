@@ -56,27 +56,11 @@ export default function DashboardPage({
     loadDashboard();
   }, []);
 
-  if (loading) return <LoadingSpinner text="Crunching financial metrics..." />;
-
-  if (error) {
-    return (
-      <div className="p-8 text-center">
-        <div className="glass-panel p-6 rounded-2xl max-w-md mx-auto border border-rose-500/30">
-          <AlertTriangle className="w-8 h-8 text-rose-400 mx-auto mb-2" />
-          <h3 className="text-base font-semibold text-white">Dashboard Error</h3>
-          <p className="text-xs text-slate-400 mt-1 mb-4">{error}</p>
-          <button
-            onClick={loadDashboard}
-            className="px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-xs text-white"
-          >
-            Retry Connection
-          </button>
-        </div>
-      </div>
-    );
+  if (loading || !data || !data.metrics) {
+    return <LoadingSpinner text="Crunching financial metrics..." />;
   }
 
-  const { metrics, business, monthlyTrend, invoiceStatusBreakdown, recentActivity } = data;
+  const { metrics, business = {}, monthlyTrend = [], invoiceStatusBreakdown = [], recentActivity = {} } = data;
 
   return (
     <div className="p-8 space-y-8 max-w-7xl mx-auto">
