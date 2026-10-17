@@ -1,8 +1,9 @@
 services:
-  # 1. Backend Web Service (Node/Express API)
+  # 1. Backend Web Service (Free Tier)
   - type: web
     name: cashflow-copilot-api
     runtime: node
+    plan: free
     rootDir: server
     buildCommand: npm install
     startCommand: npm start
@@ -22,10 +23,11 @@ services:
       - key: PAYPAL_BASE_URL
         value: https://api-m.sandbox.paypal.com
 
-  # 2. Frontend Static Site (React/Vite SPA)
+  # 2. Frontend Static Site (Free Tier)
   - type: web
     name: cashflow-copilot-client
     runtime: static
+    plan: free
     rootDir: client
     buildCommand: npm install && npm run build
     staticPublishPath: dist
