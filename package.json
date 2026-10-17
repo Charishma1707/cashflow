@@ -1,0 +1,19 @@
+{
+  "name": "cashflow-copilot",
+  "version": "1.0.0",
+  "description": "CashFlow Copilot - AI-ready financial workspace for freelancers and small businesses with PayPal Sandbox Integration",
+  "scripts": {
+    "install:all": "npm install && cd server && npm install && cd ../client && npm install",
+    "seed": "cd server && npm run seed",
+    "test": "cd server && npm test",
+    "start:server": "cd server && npm run dev",
+    "start:client": "cd client && npm run dev",
+    "dev": "concurrently \"npm run start:server\" \"npm run start:client\""
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  },
+  "keywords": ["fintech", "cashflow", "paypal", "invoices", "expenses", "mern"],
+  "author": "Antigravity Senior Full-Stack Engineer",
+  "license": "MIT"
+}

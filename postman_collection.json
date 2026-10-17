@@ -1,0 +1,270 @@
+{
+  "info": {
+    "name": "CashFlow Copilot API",
+    "_postman_id": "c38a6fcf-11a9-4b65-ba20-7f55586a849b",
+    "description": "Comprehensive API collection for CashFlow Copilot financial workspace & PayPal Sandbox integration.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:5000",
+      "type": "string"
+    },
+    {
+      "key": "invoiceId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "paypalOrderId",
+      "value": "",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "System Health",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/api/health",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "health"]
+        }
+      }
+    },
+    {
+      "name": "Dashboard",
+      "item": [
+        {
+          "name": "Get Financial Summary & Metrics",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/dashboard",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "dashboard"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Invoices",
+      "item": [
+        {
+          "name": "List All Invoices",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/invoices?status=ALL",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "invoices"],
+              "query": [
+                { "key": "status", "value": "ALL" },
+                { "key": "search", "value": "", "disabled": true }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Invoice by ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/invoices/{{invoiceId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "invoices", "{{invoiceId}}"]
+            }
+          }
+        },
+        {
+          "name": "Create Invoice",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"customer\": {\n    \"name\": \"FinTech Ventures\",\n    \"email\": \"billing@fintechventures.io\",\n    \"address\": \"450 Mission St, San Francisco, CA\"\n  },\n  \"dueDate\": \"2026-11-01\",\n  \"items\": [\n    {\n      \"description\": \"API Architecture Consultation\",\n      \"quantity\": 1,\n      \"unitPrice\": 1800\n    },\n    {\n      \"description\": \"Figma Design System Sprint\",\n      \"quantity\": 1,\n      \"unitPrice\": 2400\n    }\n  ],\n  \"taxRate\": 0,\n  \"status\": \"SENT\",\n  \"notes\": \"Net 14 payment terms. PayPal Sandbox supported.\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/invoices",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "invoices"]
+            }
+          }
+        },
+        {
+          "name": "Update Invoice Status",
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"CANCELLED\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/invoices/{{invoiceId}}/status",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "invoices", "{{invoiceId}}", "status"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Expenses",
+      "item": [
+        {
+          "name": "List Expenses",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/expenses?status=ALL",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "expenses"],
+              "query": [{ "key": "status", "value": "ALL" }]
+            }
+          }
+        },
+        {
+          "name": "Create Expense",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"description\": \"GitHub Copilot Team Subscription\",\n  \"amount\": 76.00,\n  \"category\": \"Software & Subscriptions\",\n  \"dueDate\": \"2026-11-05\",\n  \"vendor\": \"GitHub, Inc.\",\n  \"status\": \"SCHEDULED\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/expenses",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "expenses"]
+            }
+          }
+        },
+        {
+          "name": "Update Expense Status",
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"PAID\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/expenses/{{expenseId}}/status",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "expenses", "{{expenseId}}", "status"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Payments",
+      "item": [
+        {
+          "name": "Get Recorded Payment Ledger",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/payments",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "payments"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Business Settings",
+      "item": [
+        {
+          "name": "Get Business Profile & Settings",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/business",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "business"]
+            }
+          }
+        },
+        {
+          "name": "Update Business Settings",
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Acme Studio\",\n  \"currency\": \"USD\",\n  \"openingBalance\": 25000.00,\n  \"minimumCashReserve\": 10000.00,\n  \"contactEmail\": \"billing@acmestudio.design\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/business/settings",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "business", "settings"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "PayPal Sandbox Integration",
+      "item": [
+        {
+          "name": "Check PayPal Sandbox Status",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/paypal/status",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "paypal", "status"]
+            }
+          }
+        },
+        {
+          "name": "Create PayPal Order",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"invoiceId\": \"{{invoiceId}}\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/paypal/create-order",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "paypal", "create-order"]
+            }
+          }
+        },
+        {
+          "name": "Capture PayPal Order",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"orderId\": \"{{paypalOrderId}}\",\n  \"invoiceId\": \"{{invoiceId}}\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/paypal/capture-order",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "paypal", "capture-order"]
+            }
+          }
+        }
+      ]
+    }
+  ]
+}
