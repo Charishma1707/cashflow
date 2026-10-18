@@ -24,13 +24,16 @@ function AppContent() {
 
   const navigate = useNavigate();
 
-  const refreshGlobalData = async () => {
+  const refreshGlobalData = async (attempt = 1) => {
     try {
       const [biz, pp] = await Promise.all([getBusinessSettings(), getPayPalStatus()]);
-      setBusiness(biz);
-      setPaypalStatus(pp);
+      if (biz) setBusiness(biz);
+      if (pp) setPaypalStatus(pp);
     } catch (err) {
       console.warn('Initial data load warning:', err.message);
+      if (attempt < 4) {
+        setTimeout(() => refreshGlobalData(attempt + 1), 4000);
+      }
     }
   };
 
@@ -74,6 +77,9 @@ function AppContent() {
                   onOpenInvoiceModal={() => setIsInvoiceModalOpen(true)}
                   onOpenExpenseModal={() => setIsExpenseModalOpen(true)}
                   onSelectInvoice={(inv) => setSelectedInvoice(inv)}
+                  onDataLoaded={(summary) => {
+                    if (summary?.business) setBusiness(summary.business);
+                  }}
                 />
               }
             />

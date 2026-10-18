@@ -34,6 +34,6 @@ services:
         destination: /index.html
     envVars:
       - key: VITE_API_BASE_URL
-        sync: false
+        value: https://cashflow-copilot-api.onrender.com/api
       - key: VITE_PAYPAL_CLIENT_ID
-        sync: false
+        value: BAAxRbn5rr6guQZoiPQ1iD-9qdrenIW2f8RZNnXjxTYjgfdCXddb34-I6nHX1qt_W-mJkK_KqMDrD-7i_8
