@@ -40,6 +40,14 @@ export default function Navbar({ business, paypalStatus, onOpenInvoiceModal }) {
           {currentDate}
         </div>
 
+        <a
+          href="/assistant"
+          className="flex items-center space-x-1.5 px-3.5 py-2 rounded-xl text-xs font-semibold text-blue-700 bg-blue-50 border border-blue-200 hover:bg-blue-100 transition-all cursor-pointer"
+        >
+          <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+          <span>MCP Assistant</span>
+        </a>
+
         {onOpenInvoiceModal && (
           <button
             onClick={onOpenInvoiceModal}

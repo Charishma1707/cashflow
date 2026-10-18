@@ -147,5 +147,26 @@ export const capturePayPalOrder = async (orderId, invoiceId) => {
   return res.data;
 };
 
+// PayPal Remote MCP Server & AI Assistant API
+export const getMcpStatus = async () => {
+  const res = await api.get('/mcp/status');
+  return res.data;
+};
+
+export const getMcpTools = async () => {
+  const res = await api.get('/mcp/tools');
+  return res.data;
+};
+
+export const callMcpTool = async (tool, args = {}) => {
+  const res = await api.post('/mcp/call-tool', { tool, arguments: args });
+  return res.data;
+};
+
+export const chatWithMcp = async (message, history = []) => {
+  const res = await api.post('/mcp/chat', { message, history });
+  return res.data;
+};
+
 export default api;
 

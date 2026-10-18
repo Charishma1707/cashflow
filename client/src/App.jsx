@@ -7,6 +7,7 @@ import InvoicesPage from './pages/InvoicesPage';
 import ExpensesPage from './pages/ExpensesPage';
 import PaymentsPage from './pages/PaymentsPage';
 import SettingsPage from './pages/SettingsPage';
+import McpAssistantPage from './pages/McpAssistantPage';
 import InvoiceModal from './components/InvoiceModal';
 import InvoiceDetailModal from './components/InvoiceDetailModal';
 import ExpenseModal from './components/ExpenseModal';
@@ -80,6 +81,14 @@ function AppContent() {
                   onDataLoaded={(summary) => {
                     if (summary?.business) setBusiness(summary.business);
                   }}
+                />
+              }
+            />
+            <Route
+              path="/assistant"
+              element={
+                <McpAssistantPage
+                  onOpenInvoiceModal={() => setIsInvoiceModalOpen(true)}
                 />
               }
             />

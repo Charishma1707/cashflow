@@ -9,11 +9,13 @@ import {
   ShieldCheck,
   TrendingUp,
   Sparkles,
+  Bot,
 } from 'lucide-react';
 
 export default function Sidebar({ business }) {
   const navItems = [
     { name: 'Dashboard', path: '/', icon: LayoutDashboard },
+    { name: 'AI Assistant', path: '/assistant', icon: Bot, badge: 'MCP' },
     { name: 'Invoices', path: '/invoices', icon: Receipt },
     { name: 'Expenses', path: '/expenses', icon: ArrowDownCircle },
     { name: 'Payments', path: '/payments', icon: CreditCard },
@@ -55,8 +57,17 @@ export default function Sidebar({ business }) {
                 }`
               }
             >
-              <Icon className="w-4 h-4" />
-              <span>{item.name}</span>
+              <div className="flex items-center justify-between w-full">
+                <div className="flex items-center space-x-3">
+                  <Icon className="w-4 h-4" />
+                  <span>{item.name}</span>
+                </div>
+                {item.badge && (
+                  <span className="px-1.5 py-0.5 rounded text-[10px] font-bold bg-blue-100 text-blue-700">
+                    {item.badge}
+                  </span>
+                )}
+              </div>
             </NavLink>
           );
         })}
