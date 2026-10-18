@@ -102,20 +102,20 @@ export default function DashboardPage({
   if (error && (!data || !data.metrics)) {
     return (
       <div className="p-12 text-center max-w-md mx-auto">
-        <div className="glass-panel p-6 rounded-2xl border border-rose-500/30 shadow-2xl space-y-4">
-          <div className="w-12 h-12 rounded-xl bg-rose-500/10 border border-rose-500/20 flex items-center justify-center mx-auto text-rose-400">
+        <div className="bg-white p-6 rounded-2xl border border-rose-200 shadow-xl space-y-4">
+          <div className="w-12 h-12 rounded-xl bg-rose-50 border border-rose-200 flex items-center justify-center mx-auto text-rose-600">
             <AlertTriangle className="w-6 h-6" />
           </div>
           <div>
-            <h3 className="text-base font-semibold text-white">Connection Error</h3>
-            <p className="text-xs text-slate-300 mt-2 leading-relaxed">{error}</p>
+            <h3 className="text-base font-bold text-slate-900">Connection Error</h3>
+            <p className="text-xs text-slate-600 mt-2 leading-relaxed">{error}</p>
             <p className="text-[11px] text-slate-400 mt-2">
               The backend may be spinning up from idle state. Try reconnecting now.
             </p>
           </div>
           <button
             onClick={() => loadDashboard(1)}
-            className="px-5 py-2.5 rounded-xl bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 text-xs font-semibold text-white shadow-lg shadow-cyan-900/30 transition-all cursor-pointer inline-flex items-center space-x-2"
+            className="px-5 py-2.5 rounded-xl bg-gradient-to-r from-blue-600 via-indigo-600 to-blue-700 hover:from-blue-700 hover:to-indigo-700 text-xs font-semibold text-white shadow-md shadow-blue-500/25 transition-all cursor-pointer inline-flex items-center space-x-2"
           >
             <RefreshCw className="w-3.5 h-3.5" />
             <span>Retry Connection</span>
@@ -127,19 +127,18 @@ export default function DashboardPage({
 
   const { metrics, business = {}, monthlyTrend = [], invoiceStatusBreakdown = [], recentActivity = {} } = data || {};
 
-
   return (
     <div className="p-8 space-y-8 max-w-7xl mx-auto">
       {/* Top Welcome & Quick Actions */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
           <div className="flex items-center space-x-2">
-            <h1 className="text-2xl font-bold text-white tracking-tight">Financial Overview</h1>
-            <span className="px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-cyan-500/10 text-cyan-400 border border-cyan-500/20">
+            <h1 className="text-2xl font-extrabold text-slate-900 tracking-tight">Financial Overview</h1>
+            <span className="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-blue-50 text-blue-700 border border-blue-200">
               Live Ledger
             </span>
           </div>
-          <p className="text-xs text-slate-400 mt-1">
+          <p className="text-xs text-slate-500 font-medium mt-1">
             Real-time cash flow monitoring and PayPal Sandbox payments for {business.name}
           </p>
         </div>
@@ -147,14 +146,14 @@ export default function DashboardPage({
         <div className="flex items-center space-x-3">
           <button
             onClick={onOpenExpenseModal}
-            className="flex items-center space-x-1.5 px-3.5 py-2 rounded-xl text-xs font-semibold bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 transition-all cursor-pointer"
+            className="flex items-center space-x-1.5 px-3.5 py-2 rounded-xl text-xs font-semibold bg-white hover:bg-slate-50 text-slate-700 border border-slate-300 shadow-xs transition-all cursor-pointer"
           >
             <Plus className="w-3.5 h-3.5" />
             <span>Record Expense</span>
           </button>
           <button
             onClick={onOpenInvoiceModal}
-            className="flex items-center space-x-1.5 px-4 py-2 rounded-xl text-xs font-semibold text-white bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 shadow-lg shadow-cyan-900/30 transition-all cursor-pointer"
+            className="flex items-center space-x-1.5 px-4 py-2 rounded-xl text-xs font-semibold text-white bg-gradient-to-r from-blue-600 via-indigo-600 to-blue-700 hover:from-blue-700 hover:to-indigo-700 shadow-md shadow-blue-500/25 transition-all cursor-pointer"
           >
             <Plus className="w-3.5 h-3.5" />
             <span>New Invoice</span>
@@ -214,13 +213,13 @@ export default function DashboardPage({
       </div>
 
       {/* Secondary Liquidity & Cash Reserve Strip */}
-      <div className="glass-panel p-5 rounded-2xl border border-slate-800 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+      <div className="bg-white p-5 rounded-2xl border border-slate-200/90 shadow-xs flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
         <div className="flex items-center space-x-3">
           <div
             className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 border ${
               metrics.isReserveHealthy
-                ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20'
-                : 'bg-rose-500/10 text-rose-400 border-rose-500/20'
+                ? 'bg-emerald-50 text-emerald-600 border-emerald-200 shadow-xs'
+                : 'bg-rose-50 text-rose-600 border-rose-200 shadow-xs'
             }`}
           >
             {metrics.isReserveHealthy ? (
@@ -231,32 +230,32 @@ export default function DashboardPage({
           </div>
           <div>
             <div className="flex items-center space-x-2">
-              <h4 className="text-sm font-semibold text-white">
+              <h4 className="text-sm font-bold text-slate-900">
                 Cash Reserve Floor: {formatMoney(metrics.minimumCashReserve)}
               </h4>
               <span
-                className={`text-[11px] font-semibold px-2 py-0.5 rounded-full ${
+                className={`text-[11px] font-bold px-2 py-0.5 rounded-full ${
                   metrics.isReserveHealthy
-                    ? 'bg-emerald-500/10 text-emerald-400'
-                    : 'bg-rose-500/10 text-rose-400'
+                    ? 'bg-emerald-50 text-emerald-700 border border-emerald-200'
+                    : 'bg-rose-50 text-rose-700 border border-rose-200'
                 }`}
               >
                 {metrics.isReserveHealthy ? 'Healthy Cushion' : 'Liquidity Warning'}
               </span>
             </div>
-            <p className="text-xs text-slate-400 mt-0.5">
+            <p className="text-xs text-slate-500 font-medium mt-0.5">
               Available Cash ({formatMoney(metrics.currentAvailableCash)}) - Scheduled Obligations (
               {formatMoney(metrics.scheduledExpenses)}) leaves a projected net cash of{' '}
-              <strong className="text-white font-mono">{formatMoney(metrics.projectedNetCash)}</strong>.
+              <strong className="text-slate-800 font-bold font-mono">{formatMoney(metrics.projectedNetCash)}</strong>.
             </p>
           </div>
         </div>
 
         <div className="text-right text-xs shrink-0 font-mono">
-          <span className="text-slate-400 block">Variance to Minimum Reserve</span>
+          <span className="text-slate-400 block font-medium font-sans">Variance to Minimum Reserve</span>
           <span
-            className={`text-sm font-bold ${
-              metrics.reserveVariance >= 0 ? 'text-emerald-400' : 'text-rose-400'
+            className={`text-sm font-extrabold ${
+              metrics.reserveVariance >= 0 ? 'text-emerald-600' : 'text-rose-600'
             }`}
           >
             {metrics.reserveVariance >= 0 ? '+' : ''}
@@ -268,20 +267,20 @@ export default function DashboardPage({
       {/* Charts Section */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Monthly Trend Area Chart */}
-        <div className="lg:col-span-2 glass-panel p-6 rounded-2xl border border-slate-800">
+        <div className="lg:col-span-2 bg-white p-6 rounded-2xl border border-slate-200/90 shadow-xs">
           <div className="flex items-center justify-between mb-6">
             <div>
-              <h3 className="text-sm font-semibold text-white">Monthly Cash Flow Trend</h3>
-              <p className="text-xs text-slate-400">Inflows (payments) vs Outflows (expenses)</p>
+              <h3 className="text-sm font-bold text-slate-900">Monthly Cash Flow Trend</h3>
+              <p className="text-xs text-slate-500 font-medium">Inflows (payments) vs Outflows (expenses)</p>
             </div>
             <div className="flex items-center space-x-3 text-xs">
               <div className="flex items-center space-x-1.5">
-                <div className="w-2.5 h-2.5 rounded-full bg-cyan-400"></div>
-                <span className="text-slate-400">Inflow</span>
+                <div className="w-2.5 h-2.5 rounded-full bg-blue-600"></div>
+                <span className="text-slate-600 font-semibold">Inflow</span>
               </div>
               <div className="flex items-center space-x-1.5">
-                <div className="w-2.5 h-2.5 rounded-full bg-rose-400"></div>
-                <span className="text-slate-400">Outflow</span>
+                <div className="w-2.5 h-2.5 rounded-full bg-rose-500"></div>
+                <span className="text-slate-600 font-semibold">Outflow</span>
               </div>
             </div>
           </div>
@@ -291,36 +290,38 @@ export default function DashboardPage({
               <AreaChart data={monthlyTrend}>
                 <defs>
                   <linearGradient id="colorInflow" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="#06b6d4" stopOpacity={0.4} />
-                    <stop offset="95%" stopColor="#06b6d4" stopOpacity={0} />
+                    <stop offset="5%" stopColor="#2563eb" stopOpacity={0.35} />
+                    <stop offset="95%" stopColor="#2563eb" stopOpacity={0.02} />
                   </linearGradient>
                   <linearGradient id="colorOutflow" x1="0" y1="0" x2="0" y2="1">
                     <stop offset="5%" stopColor="#f43f5e" stopOpacity={0.3} />
-                    <stop offset="95%" stopColor="#f43f5e" stopOpacity={0} />
+                    <stop offset="95%" stopColor="#f43f5e" stopOpacity={0.02} />
                   </linearGradient>
                 </defs>
-                <CartesianGrid strokeDasharray="3 3" stroke="#1f2937" vertical={false} />
-                <XAxis dataKey="month" stroke="#64748b" fontSize={11} tickLine={false} />
+                <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" vertical={false} />
+                <XAxis dataKey="month" stroke="#94a3b8" fontSize={11} tickLine={false} />
                 <YAxis
-                  stroke="#64748b"
+                  stroke="#94a3b8"
                   fontSize={11}
                   tickLine={false}
                   tickFormatter={(val) => `$${val}`}
                 />
                 <Tooltip
                   contentStyle={{
-                    backgroundColor: '#111827',
-                    borderColor: '#374151',
+                    backgroundColor: '#ffffff',
+                    borderColor: '#e2e8f0',
+                    color: '#0f172a',
                     borderRadius: '12px',
                     fontSize: '12px',
+                    boxShadow: '0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.05)',
                   }}
                   formatter={(value) => [`$${value.toLocaleString()}`, '']}
                 />
                 <Area
                   type="monotone"
                   dataKey="inflow"
-                  stroke="#06b6d4"
-                  strokeWidth={2}
+                  stroke="#2563eb"
+                  strokeWidth={2.5}
                   fillOpacity={1}
                   fill="url(#colorInflow)"
                 />
@@ -328,7 +329,7 @@ export default function DashboardPage({
                   type="monotone"
                   dataKey="outflow"
                   stroke="#f43f5e"
-                  strokeWidth={2}
+                  strokeWidth={2.5}
                   fillOpacity={1}
                   fill="url(#colorOutflow)"
                 />
@@ -338,32 +339,32 @@ export default function DashboardPage({
         </div>
 
         {/* Invoice Status Distribution */}
-        <div className="glass-panel p-6 rounded-2xl border border-slate-800 flex flex-col justify-between">
+        <div className="bg-white p-6 rounded-2xl border border-slate-200/90 shadow-xs flex flex-col justify-between">
           <div>
-            <h3 className="text-sm font-semibold text-white">Invoice Receivables</h3>
-            <p className="text-xs text-slate-400 mb-4">Breakdown by current lifecycle status</p>
+            <h3 className="text-sm font-bold text-slate-900">Invoice Receivables</h3>
+            <p className="text-xs text-slate-500 font-medium mb-4">Breakdown by current lifecycle status</p>
 
-            <div className="space-y-3">
+            <div className="space-y-3.5">
               {invoiceStatusBreakdown?.map((item) => (
                 <div key={item.status} className="space-y-1">
                   <div className="flex justify-between text-xs">
-                    <span className="text-slate-300 font-medium">{item.status}</span>
-                    <span className="font-mono text-slate-400">
+                    <span className="text-slate-700 font-semibold">{item.status}</span>
+                    <span className="font-mono text-slate-500 font-medium">
                       {formatMoney(item.totalAmount)} ({item.count})
                     </span>
                   </div>
-                  <div className="w-full bg-slate-800 rounded-full h-1.5 overflow-hidden">
+                  <div className="w-full bg-slate-100 rounded-full h-2 overflow-hidden">
                     <div
                       className={`h-full rounded-full ${
                         item.status === 'PAID'
-                          ? 'bg-emerald-400'
+                          ? 'bg-emerald-500'
                           : item.status === 'OVERDUE'
                           ? 'bg-rose-500'
                           : item.status === 'PARTIALLY_PAID'
-                          ? 'bg-indigo-400'
+                          ? 'bg-indigo-500'
                           : item.status === 'SENT'
-                          ? 'bg-cyan-400'
-                          : 'bg-slate-600'
+                          ? 'bg-blue-500'
+                          : 'bg-slate-400'
                       }`}
                       style={{
                         width: `${Math.min(
@@ -378,9 +379,9 @@ export default function DashboardPage({
             </div>
           </div>
 
-          <div className="pt-4 border-t border-slate-800 mt-4 text-xs flex justify-between items-center text-slate-400">
-            <span>Total Invoices</span>
-            <span className="font-semibold text-white">{metrics.totalInvoicesCount}</span>
+          <div className="pt-4 border-t border-slate-100 mt-4 text-xs flex justify-between items-center text-slate-500">
+            <span className="font-medium">Total Invoices</span>
+            <span className="font-bold text-slate-900">{metrics.totalInvoicesCount}</span>
           </div>
         </div>
       </div>
@@ -388,13 +389,13 @@ export default function DashboardPage({
       {/* Recent Activity Sections (Recent Invoices & Upcoming Expenses) */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Recent Invoices with Quick Pay action */}
-        <div className="glass-panel p-6 rounded-2xl border border-slate-800 space-y-4">
+        <div className="bg-white p-6 rounded-2xl border border-slate-200/90 shadow-xs space-y-4">
           <div className="flex items-center justify-between">
-            <h3 className="text-sm font-semibold text-white flex items-center space-x-2">
-              <Receipt className="w-4 h-4 text-cyan-400" />
+            <h3 className="text-sm font-bold text-slate-900 flex items-center space-x-2">
+              <Receipt className="w-4 h-4 text-blue-600" />
               <span>Recent Invoices</span>
             </h3>
-            <span className="text-xs text-slate-400">Click to preview & pay</span>
+            <span className="text-xs text-slate-500 font-medium">Click to preview & pay</span>
           </div>
 
           <div className="space-y-2.5">
@@ -402,14 +403,14 @@ export default function DashboardPage({
               <div
                 key={inv._id}
                 onClick={() => onSelectInvoice && onSelectInvoice(inv)}
-                className="p-3.5 rounded-xl bg-slate-900/40 hover:bg-slate-800/60 border border-slate-800/80 hover:border-cyan-500/30 flex items-center justify-between cursor-pointer transition-all group"
+                className="p-3.5 rounded-xl bg-slate-50/80 hover:bg-blue-50/50 border border-slate-200/80 hover:border-blue-300 flex items-center justify-between cursor-pointer transition-all group shadow-2xs"
               >
                 <div>
                   <div className="flex items-center space-x-2">
-                    <span className="font-mono text-xs font-bold text-white group-hover:text-cyan-400 transition-colors">
+                    <span className="font-mono text-xs font-bold text-slate-800 group-hover:text-blue-600 transition-colors">
                       {inv.invoiceNumber}
                     </span>
-                    <span className="text-xs text-slate-400">• {inv.customer?.name}</span>
+                    <span className="text-xs text-slate-500 font-medium">• {inv.customer?.name}</span>
                   </div>
                   <span className="text-[11px] text-slate-400">
                     Due {new Date(inv.dueDate).toLocaleDateString()}
@@ -417,16 +418,16 @@ export default function DashboardPage({
                 </div>
 
                 <div className="text-right">
-                  <span className="font-mono text-xs font-bold text-white block">
+                  <span className="font-mono text-xs font-bold text-slate-900 block">
                     {formatMoney(inv.outstandingBalance)}
                   </span>
                   <span
-                    className={`text-[10px] px-1.5 py-0.5 rounded font-medium ${
+                    className={`text-[10px] px-2 py-0.5 rounded-full font-bold ${
                       inv.status === 'PAID'
-                        ? 'bg-emerald-500/10 text-emerald-400'
+                        ? 'bg-emerald-50 text-emerald-700 border border-emerald-200'
                         : inv.status === 'OVERDUE'
-                        ? 'bg-rose-500/10 text-rose-400'
-                        : 'bg-cyan-500/10 text-cyan-400'
+                        ? 'bg-rose-50 text-rose-700 border border-rose-200'
+                        : 'bg-blue-50 text-blue-700 border border-blue-200'
                     }`}
                   >
                     {inv.status}
@@ -438,13 +439,13 @@ export default function DashboardPage({
         </div>
 
         {/* Upcoming Financial Obligations (Expenses) */}
-        <div className="glass-panel p-6 rounded-2xl border border-slate-800 space-y-4">
+        <div className="bg-white p-6 rounded-2xl border border-slate-200/90 shadow-xs space-y-4">
           <div className="flex items-center justify-between">
-            <h3 className="text-sm font-semibold text-white flex items-center space-x-2">
-              <Calendar className="w-4 h-4 text-rose-400" />
+            <h3 className="text-sm font-bold text-slate-900 flex items-center space-x-2">
+              <Calendar className="w-4 h-4 text-rose-600" />
               <span>Upcoming Scheduled Expenses</span>
             </h3>
-            <span className="text-xs text-slate-400">Scheduled outflows</span>
+            <span className="text-xs text-slate-500 font-medium">Scheduled outflows</span>
           </div>
 
           <div className="space-y-2.5">
@@ -454,17 +455,17 @@ export default function DashboardPage({
               recentActivity.upcomingExpenses?.map((exp) => (
                 <div
                   key={exp._id}
-                  className="p-3.5 rounded-xl bg-slate-900/40 border border-slate-800/80 flex items-center justify-between"
+                  className="p-3.5 rounded-xl bg-slate-50/80 border border-slate-200/80 flex items-center justify-between shadow-2xs"
                 >
                   <div>
-                    <span className="text-xs font-medium text-slate-200 block">
+                    <span className="text-xs font-bold text-slate-800 block">
                       {exp.description}
                     </span>
-                    <span className="text-[11px] text-slate-400">
+                    <span className="text-[11px] text-slate-500">
                       {exp.vendor || exp.category} • Due {new Date(exp.dueDate).toLocaleDateString()}
                     </span>
                   </div>
-                  <span className="font-mono text-xs font-bold text-rose-400">
+                  <span className="font-mono text-xs font-bold text-rose-600">
                     -{formatMoney(exp.amount)}
                   </span>
                 </div>
@@ -476,3 +477,4 @@ export default function DashboardPage({
     </div>
   );
 }
+

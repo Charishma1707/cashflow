@@ -57,12 +57,12 @@ export default function InvoicesPage({ onOpenInvoiceModal, onSelectInvoice }) {
 
   const getStatusBadge = (status) => {
     const config = {
-      PAID: 'bg-emerald-500/15 text-emerald-400 border-emerald-500/30',
-      PARTIALLY_PAID: 'bg-indigo-500/15 text-indigo-400 border-indigo-500/30',
-      SENT: 'bg-cyan-500/15 text-cyan-400 border-cyan-500/30',
-      OVERDUE: 'bg-rose-500/15 text-rose-400 border-rose-500/30',
-      DRAFT: 'bg-slate-700/40 text-slate-300 border-slate-600/40',
-      CANCELLED: 'bg-slate-800 text-slate-400 border-slate-700',
+      PAID: 'bg-emerald-50 text-emerald-700 border-emerald-200 font-bold',
+      PARTIALLY_PAID: 'bg-indigo-50 text-indigo-700 border-indigo-200 font-bold',
+      SENT: 'bg-blue-50 text-blue-700 border-blue-200 font-bold',
+      OVERDUE: 'bg-rose-50 text-rose-700 border-rose-200 font-bold',
+      DRAFT: 'bg-slate-100 text-slate-700 border-slate-200 font-bold',
+      CANCELLED: 'bg-slate-100 text-slate-500 border-slate-200 font-bold',
     };
     return config[status] || config.SENT;
   };
@@ -73,12 +73,12 @@ export default function InvoicesPage({ onOpenInvoiceModal, onSelectInvoice }) {
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
           <div className="flex items-center space-x-2">
-            <h1 className="text-2xl font-bold text-white tracking-tight">Invoices</h1>
-            <span className="px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-cyan-500/10 text-cyan-400 border border-cyan-500/20">
+            <h1 className="text-2xl font-extrabold text-slate-900 tracking-tight">Invoices</h1>
+            <span className="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-blue-50 text-blue-700 border border-blue-200">
               AG Grid Powered
             </span>
           </div>
-          <p className="text-xs text-slate-400 mt-1">
+          <p className="text-xs text-slate-500 font-medium mt-1">
             Manage billing, trigger PayPal Sandbox payments, and launch AI Nudges
           </p>
         </div>
@@ -87,7 +87,7 @@ export default function InvoicesPage({ onOpenInvoiceModal, onSelectInvoice }) {
           {/* AI Nudge-Bot Button */}
           <button
             onClick={() => setIsNudgeBotOpen(true)}
-            className="flex items-center space-x-1.5 px-3.5 py-2 rounded-xl text-xs font-semibold bg-gradient-to-r from-cyan-600/20 to-blue-600/20 text-cyan-400 border border-cyan-500/40 hover:bg-cyan-600/30 transition-all cursor-pointer shadow-md shadow-cyan-950/30"
+            className="flex items-center space-x-1.5 px-3.5 py-2 rounded-xl text-xs font-semibold bg-gradient-to-r from-violet-600 to-indigo-600 hover:from-violet-700 hover:to-indigo-700 text-white shadow-md shadow-violet-500/20 transition-all cursor-pointer"
           >
             <Sparkles className="w-3.5 h-3.5" />
             <span>AI Nudge-Bot</span>
@@ -96,7 +96,7 @@ export default function InvoicesPage({ onOpenInvoiceModal, onSelectInvoice }) {
           {/* New Invoice Button */}
           <button
             onClick={onOpenInvoiceModal}
-            className="flex items-center space-x-1.5 px-4 py-2 rounded-xl text-xs font-semibold text-white bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 shadow-lg shadow-cyan-900/30 transition-all cursor-pointer"
+            className="flex items-center space-x-1.5 px-4 py-2 rounded-xl text-xs font-semibold text-white bg-gradient-to-r from-blue-600 via-indigo-600 to-blue-700 hover:from-blue-700 hover:to-indigo-700 shadow-md shadow-blue-500/25 transition-all cursor-pointer"
           >
             <Plus className="w-3.5 h-3.5" />
             <span>Create Invoice</span>
@@ -112,10 +112,10 @@ export default function InvoicesPage({ onOpenInvoiceModal, onSelectInvoice }) {
             <button
               key={st}
               onClick={() => setStatusFilter(st)}
-              className={`px-3 py-1.5 rounded-xl text-xs font-medium transition-all shrink-0 cursor-pointer ${
+              className={`px-3 py-1.5 rounded-xl text-xs font-semibold transition-all shrink-0 cursor-pointer ${
                 statusFilter === st
-                  ? 'bg-cyan-600 text-white shadow-md shadow-cyan-900/30'
-                  : 'bg-slate-900/60 text-slate-400 hover:text-white border border-slate-800'
+                  ? 'bg-blue-600 text-white shadow-xs'
+                  : 'bg-white text-slate-600 hover:text-slate-900 border border-slate-200 hover:bg-slate-50 shadow-2xs'
               }`}
             >
               {st.replace('_', ' ')}
@@ -124,13 +124,13 @@ export default function InvoicesPage({ onOpenInvoiceModal, onSelectInvoice }) {
         </div>
 
         {/* View Toggle (AG Grid vs Standard) */}
-        <div className="flex items-center space-x-2 bg-slate-900/80 p-1 rounded-xl border border-slate-800 shrink-0">
+        <div className="flex items-center space-x-1.5 bg-white p-1 rounded-xl border border-slate-200 shadow-2xs shrink-0">
           <button
             onClick={() => setViewMode('ag-grid')}
-            className={`flex items-center space-x-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all cursor-pointer ${
+            className={`flex items-center space-x-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all cursor-pointer ${
               viewMode === 'ag-grid'
-                ? 'bg-cyan-600 text-white shadow-sm'
-                : 'text-slate-400 hover:text-white'
+                ? 'bg-blue-600 text-white shadow-xs'
+                : 'text-slate-500 hover:text-slate-900'
             }`}
           >
             <LayoutGrid className="w-3.5 h-3.5" />
@@ -139,10 +139,10 @@ export default function InvoicesPage({ onOpenInvoiceModal, onSelectInvoice }) {
 
           <button
             onClick={() => setViewMode('standard')}
-            className={`flex items-center space-x-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all cursor-pointer ${
+            className={`flex items-center space-x-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all cursor-pointer ${
               viewMode === 'standard'
-                ? 'bg-cyan-600 text-white shadow-sm'
-                : 'text-slate-400 hover:text-white'
+                ? 'bg-blue-600 text-white shadow-xs'
+                : 'text-slate-500 hover:text-slate-900'
             }`}
           >
             <Table className="w-3.5 h-3.5" />
@@ -155,8 +155,8 @@ export default function InvoicesPage({ onOpenInvoiceModal, onSelectInvoice }) {
       {loading ? (
         <LoadingSpinner text="Loading invoices into AG Grid..." />
       ) : error ? (
-        <div className="glass-panel p-6 rounded-2xl text-center border border-rose-500/30">
-          <p className="text-xs text-rose-400">{error}</p>
+        <div className="bg-white p-6 rounded-2xl text-center border border-rose-200 shadow-xs">
+          <p className="text-xs text-rose-600 font-semibold">{error}</p>
         </div>
       ) : invoices.length === 0 ? (
         <EmptyState
@@ -177,10 +177,10 @@ export default function InvoicesPage({ onOpenInvoiceModal, onSelectInvoice }) {
           onOpenNudgeBot={() => setIsNudgeBotOpen(true)}
         />
       ) : (
-        <div className="glass-panel rounded-2xl border border-slate-800 overflow-hidden">
+        <div className="bg-white rounded-2xl border border-slate-200/90 shadow-xs overflow-hidden">
           <div className="overflow-x-auto">
             <table className="w-full text-left text-xs">
-              <thead className="bg-slate-900/90 text-slate-400 uppercase tracking-wider border-b border-slate-800">
+              <thead className="bg-slate-50 text-slate-500 font-bold uppercase tracking-wider border-b border-slate-200">
                 <tr>
                   <th className="py-3 px-4">Invoice #</th>
                   <th className="py-3 px-4">Customer</th>
@@ -192,43 +192,43 @@ export default function InvoicesPage({ onOpenInvoiceModal, onSelectInvoice }) {
                   <th className="py-3 px-4 text-right">Action</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-800/60">
+              <tbody className="divide-y divide-slate-100">
                 {invoices.map((inv) => (
                   <tr
                     key={inv._id}
                     onClick={() => onSelectInvoice && onSelectInvoice(inv)}
-                    className="hover:bg-slate-800/40 transition-colors cursor-pointer group"
+                    className="hover:bg-blue-50/40 transition-colors cursor-pointer group"
                   >
-                    <td className="py-3.5 px-4 font-mono font-bold text-white group-hover:text-cyan-400 transition-colors">
+                    <td className="py-3.5 px-4 font-mono font-bold text-slate-900 group-hover:text-blue-600 transition-colors">
                       {inv.invoiceNumber}
                     </td>
-                    <td className="py-3.5 px-4 font-medium text-slate-200">
-                      <div>{inv.customer?.name}</div>
-                      <span className="text-[11px] text-slate-400">{inv.customer?.email}</span>
+                    <td className="py-3.5 px-4">
+                      <div className="font-bold text-slate-800">{inv.customer?.name}</div>
+                      <span className="text-[11px] text-slate-400 font-medium">{inv.customer?.email}</span>
                     </td>
-                    <td className="py-3.5 px-4 text-slate-400">
+                    <td className="py-3.5 px-4 text-slate-500 font-medium">
                       {new Date(inv.issueDate || inv.createdAt).toLocaleDateString()}
                     </td>
-                    <td className="py-3.5 px-4 text-slate-400">
+                    <td className="py-3.5 px-4">
                       <span
                         className={
                           inv.status === 'OVERDUE'
-                            ? 'text-rose-400 font-semibold'
-                            : 'text-slate-300'
+                            ? 'text-rose-600 font-bold'
+                            : 'text-slate-600 font-medium'
                         }
                       >
                         {new Date(inv.dueDate).toLocaleDateString()}
                       </span>
                     </td>
-                    <td className="py-3.5 px-4 text-right font-mono font-semibold text-white">
+                    <td className="py-3.5 px-4 text-right font-mono font-semibold text-slate-800">
                       {formatMoney(inv.totalAmount)}
                     </td>
-                    <td className="py-3.5 px-4 text-right font-mono font-bold text-cyan-400">
+                    <td className="py-3.5 px-4 text-right font-mono font-bold text-blue-600">
                       {formatMoney(inv.outstandingBalance)}
                     </td>
                     <td className="py-3.5 px-4 text-center">
                       <span
-                        className={`inline-block px-2.5 py-0.5 rounded-full text-[10px] font-semibold border ${getStatusBadge(
+                        className={`inline-block px-2.5 py-0.5 rounded-full text-[10px] font-bold border ${getStatusBadge(
                           inv.status
                         )}`}
                       >
@@ -242,7 +242,7 @@ export default function InvoicesPage({ onOpenInvoiceModal, onSelectInvoice }) {
                             e.stopPropagation();
                             onSelectInvoice(inv);
                           }}
-                          className="inline-flex items-center space-x-1 px-3 py-1 rounded-lg text-xs font-semibold bg-cyan-600/20 text-cyan-400 border border-cyan-500/30 hover:bg-cyan-600/30 cursor-pointer transition-all"
+                          className="inline-flex items-center space-x-1 px-3 py-1 rounded-lg text-xs font-semibold bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white shadow-2xs cursor-pointer transition-all"
                         >
                           <CreditCard className="w-3.5 h-3.5" />
                           <span>Pay with PayPal</span>
@@ -253,7 +253,7 @@ export default function InvoicesPage({ onOpenInvoiceModal, onSelectInvoice }) {
                             e.stopPropagation();
                             onSelectInvoice(inv);
                           }}
-                          className="inline-flex items-center space-x-1 px-2.5 py-1 rounded-lg text-xs text-slate-400 hover:text-white hover:bg-slate-800 transition-colors"
+                          className="inline-flex items-center space-x-1 px-2.5 py-1 rounded-lg text-xs font-medium text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition-colors"
                         >
                           <Eye className="w-3.5 h-3.5" />
                           <span>Details</span>

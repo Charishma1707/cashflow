@@ -55,7 +55,7 @@ function AppContent() {
   };
 
   return (
-    <div className="flex min-h-screen bg-[#080c14] text-slate-100">
+    <div className="flex min-h-screen bg-[#f8fafc] text-slate-900 selection:bg-blue-500/20 selection:text-blue-600">
       {/* Persistent Left Sidebar */}
       <Sidebar business={business} />
 

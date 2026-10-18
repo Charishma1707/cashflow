@@ -10,40 +10,40 @@ export default function Navbar({ business, paypalStatus, onOpenInvoiceModal }) {
   });
 
   return (
-    <header className="h-16 border-b border-slate-800/80 bg-[#0a0e17]/80 backdrop-blur-md px-8 flex items-center justify-between sticky top-0 z-20">
+    <header className="h-16 border-b border-slate-200/90 bg-white/90 backdrop-blur-md px-8 flex items-center justify-between sticky top-0 z-20 shadow-xs">
       <div className="flex items-center space-x-3">
-        <h2 className="text-lg font-semibold text-white tracking-tight">
+        <h2 className="text-lg font-bold text-slate-900 tracking-tight">
           {business?.name || 'Acme Studio'}
         </h2>
-        <span className="text-xs px-2 py-0.5 rounded-full bg-slate-800 text-slate-300 border border-slate-700">
+        <span className="text-xs px-2.5 py-0.5 rounded-full bg-slate-100 text-slate-700 font-semibold border border-slate-200">
           {business?.currency || 'USD'}
         </span>
       </div>
 
       <div className="flex items-center space-x-4">
         {/* Sandbox Status Badge */}
-        <div className="flex items-center space-x-1.5 px-3 py-1 rounded-full text-xs font-medium border bg-slate-900/60 border-slate-800">
+        <div className="flex items-center space-x-1.5 px-3 py-1 rounded-full text-xs font-semibold border">
           {paypalStatus?.configured ? (
-            <>
-              <ShieldCheck className="w-3.5 h-3.5 text-emerald-400" />
-              <span className="text-emerald-400">PayPal Sandbox Connected</span>
-            </>
+            <div className="flex items-center space-x-1.5 text-emerald-700 bg-emerald-50 border-emerald-200 px-2 py-0.5 rounded-full">
+              <ShieldCheck className="w-3.5 h-3.5 text-emerald-600" />
+              <span>PayPal Sandbox Connected</span>
+            </div>
           ) : (
-            <>
-              <ShieldAlert className="w-3.5 h-3.5 text-amber-400" />
-              <span className="text-amber-400">PayPal Credentials Setup Needed</span>
-            </>
+            <div className="flex items-center space-x-1.5 text-amber-700 bg-amber-50 border-amber-200 px-2 py-0.5 rounded-full">
+              <ShieldAlert className="w-3.5 h-3.5 text-amber-600" />
+              <span>PayPal Credentials Setup Needed</span>
+            </div>
           )}
         </div>
 
-        <div className="text-xs text-slate-400 hidden md:block">
+        <div className="text-xs text-slate-500 font-medium hidden md:block">
           {currentDate}
         </div>
 
         {onOpenInvoiceModal && (
           <button
             onClick={onOpenInvoiceModal}
-            className="flex items-center space-x-1.5 px-3.5 py-1.5 rounded-xl text-xs font-semibold text-white bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 shadow-md shadow-cyan-900/30 transition-all cursor-pointer"
+            className="flex items-center space-x-1.5 px-4 py-2 rounded-xl text-xs font-semibold text-white bg-gradient-to-r from-blue-600 via-indigo-600 to-blue-700 hover:from-blue-700 hover:to-indigo-700 shadow-md shadow-blue-500/25 transition-all cursor-pointer"
           >
             <Plus className="w-3.5 h-3.5" />
             <span>New Invoice</span>
@@ -53,3 +53,4 @@ export default function Navbar({ business, paypalStatus, onOpenInvoiceModal }) {
     </header>
   );
 }
+
