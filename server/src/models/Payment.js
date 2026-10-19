@@ -5,7 +5,11 @@ const PaymentSchema = new mongoose.Schema(
     businessId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'Business',
-      required: true,
+      index: true,
+    },
+    orderId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Order',
       index: true,
     },
     invoiceId: {

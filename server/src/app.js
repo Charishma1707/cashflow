@@ -20,6 +20,7 @@ import authRoutes from './routes/authRoutes.js';
 import listingRoutes from './routes/listingRoutes.js';
 import marketplaceOrderRoutes from './routes/marketplaceOrderRoutes.js';
 import auditLogRoutes from './routes/auditLogRoutes.js';
+import paypalWebhookRoutes from './routes/paypalWebhookRoutes.js';
 
 dotenv.config();
 
@@ -93,6 +94,7 @@ app.use('/api/auth', authRoutes);
 app.use('/api/listings', listingRoutes);
 app.use('/api/marketplace-orders', marketplaceOrderRoutes);
 app.use('/api/audit-logs', auditLogRoutes);
+app.use('/api/webhooks', paypalWebhookRoutes);
 
 // 404 Handler
 app.use((req, res) => {

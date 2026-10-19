@@ -11,7 +11,17 @@ const AuditLogSchema = new mongoose.Schema(
     },
     actorType: {
       type: String,
-      enum: ['customer_agent', 'seller_agent', 'human_user', 'system', 'verifier_agent', 'mediator_agent'],
+      enum: [
+        'customer_agent',
+        'seller_agent',
+        'human_user',
+        'system',
+        'verifier_agent',
+        'mediator_agent',
+        'paypal_system',
+        'paypal_tool',
+        'paypal_webhook',
+      ],
       required: true,
       index: true,
       immutable: true,
