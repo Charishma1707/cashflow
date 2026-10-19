@@ -12,3 +12,4 @@ export { AuditLog } from './AuditLog.js';
 export { PayPalIdempotency } from './PayPalIdempotency.js';
 export { CustomerPolicy } from './CustomerPolicy.js';
 export { ApprovalRequest } from './ApprovalRequest.js';
+export { SellerPolicy } from './SellerPolicy.js';

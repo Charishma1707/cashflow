@@ -59,6 +59,12 @@ const ListingSchema = new mongoose.Schema(
       required: true,
       min: 0,
     },
+    // Underlying unit cost for margin floor calculations
+    costCents: {
+      type: Number,
+      default: 0,
+      min: 0,
+    },
     currency: {
       type: String,
       default: 'USD',
