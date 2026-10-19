@@ -10,3 +10,5 @@ export { User } from './User.js';
 export { Listing } from './Listing.js';
 export { AuditLog } from './AuditLog.js';
 export { PayPalIdempotency } from './PayPalIdempotency.js';
+export { CustomerPolicy } from './CustomerPolicy.js';
+export { ApprovalRequest } from './ApprovalRequest.js';
