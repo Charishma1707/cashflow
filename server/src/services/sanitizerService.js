@@ -63,6 +63,10 @@ export class SanitizerService {
       'proposedTerms',
       'notes',
       'metadata',
+      'messageId',
+      'signature',
+      'timestamp',
+      'ackedBy',
     ];
 
     this.validatePayloadKeys(message, allowedKeys);
