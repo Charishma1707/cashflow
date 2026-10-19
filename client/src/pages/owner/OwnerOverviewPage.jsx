@@ -13,8 +13,18 @@ import {
   CreditCard,
   Building2,
   CheckCircle2,
+  Sliders,
+  ShieldCheck,
+  Lock,
 } from 'lucide-react';
-import { getDashboardSummary, getOrders, formatMoney } from '../../services/api';
+import {
+  getDashboardSummary,
+  getOrders,
+  formatMoney,
+  getSellerPolicy,
+  updateSellerPolicy,
+  verifyAuditChain,
+} from '../../services/api';
 import StatCard from '../../components/StatCard';
 import LoadingSpinner from '../../components/LoadingSpinner';
 
@@ -24,18 +34,38 @@ export default function OwnerOverviewPage() {
 
   const [summary, setSummary] = useState(null);
   const [orders, setOrders] = useState([]);
+  const [sellerPolicy, setSellerPolicy] = useState(null);
+  const [chainStatus, setChainStatus] = useState(null);
+  const [verifyingChain, setVerifyingChain] = useState(false);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     setLoading(true);
-    Promise.all([getDashboardSummary(), getOrders()])
-      .then(([dashData, ordData]) => {
+    Promise.all([
+      getDashboardSummary().catch(() => null),
+      getOrders().catch(() => []),
+      getSellerPolicy().catch(() => null),
+    ])
+      .then(([dashData, ordData, policyData]) => {
         setSummary(dashData);
         setOrders(ordData || []);
+        setSellerPolicy(policyData);
       })
       .catch((e) => console.warn('Owner overview load warning:', e.message))
       .finally(() => setLoading(false));
   }, []);
+
+  const handleVerifyChain = async () => {
+    setVerifyingChain(true);
+    try {
+      const res = await verifyAuditChain();
+      setChainStatus(res);
+    } catch (err) {
+      console.warn('Chain verification failed:', err.message);
+    } finally {
+      setVerifyingChain(false);
+    }
+  };
 
   if (loading) {
     return (
@@ -204,6 +234,107 @@ export default function OwnerOverviewPage() {
                 <p className="text-[11px] text-slate-500">Production web store & backend API</p>
               </div>
               <span className="text-xs font-mono font-bold text-slate-800">$45.00 / mo</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Autonomous Seller Policy & Cryptographic Audit Ledger Section (Prompts 4 & 11) */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        {/* Seller Policy Engine */}
+        <div className="bg-white rounded-3xl border border-slate-200/90 p-6 shadow-xs space-y-4">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center space-x-2">
+              <Sliders className="w-5 h-5 text-indigo-600" />
+              <h3 className="text-sm font-bold text-slate-900">Autonomous Seller Policy Engine</h3>
+            </div>
+            <span className="text-xs px-2.5 py-0.5 rounded-full font-bold bg-indigo-50 text-indigo-700 border border-indigo-200">
+              Active Server Enforced
+            </span>
+          </div>
+
+          <p className="text-xs text-slate-500">
+            Configure atomic capacity constraints and deterministic offer thresholds for your autonomous seller agent.
+          </p>
+
+          <div className="space-y-3 pt-1 text-xs">
+            <div className="p-3 rounded-2xl bg-slate-50 border border-slate-100 flex items-center justify-between">
+              <div>
+                <p className="font-bold text-slate-900">Max Concurrent Order Capacity</p>
+                <p className="text-[11px] text-slate-500">Atomic limit before CAPACITY_EXCEEDED</p>
+              </div>
+              <span className="font-mono font-extrabold text-sm text-slate-900">
+                {sellerPolicy?.maxConcurrentOrders || 10} orders
+              </span>
+            </div>
+
+            <div className="p-3 rounded-2xl bg-slate-50 border border-slate-100 flex items-center justify-between">
+              <div>
+                <p className="font-bold text-slate-900">Auto-Accept Offer Threshold</p>
+                <p className="text-[11px] text-slate-500">Instantly accepts offers at or above</p>
+              </div>
+              <span className="font-mono font-extrabold text-sm text-emerald-600">
+                {sellerPolicy?.autoAcceptRatio ? `${Math.round(sellerPolicy.autoAcceptRatio * 100)}%` : '95%'} of list price
+              </span>
+            </div>
+
+            <div className="p-3 rounded-2xl bg-slate-50 border border-slate-100 flex items-center justify-between">
+              <div>
+                <p className="font-bold text-slate-900">Minimum Floor Margin</p>
+                <p className="text-[11px] text-slate-500">Never counters below this profit margin</p>
+              </div>
+              <span className="font-mono font-extrabold text-sm text-slate-900">
+                {sellerPolicy?.minMarginPercent || 20}% margin
+              </span>
+            </div>
+          </div>
+        </div>
+
+        {/* Cryptographic SHA-256 Audit Trail */}
+        <div className="bg-white rounded-3xl border border-slate-200/90 p-6 shadow-xs space-y-4">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center space-x-2">
+              <Lock className="w-5 h-5 text-emerald-600" />
+              <h3 className="text-sm font-bold text-slate-900">Tamper-Evident SHA-256 Audit Chain</h3>
+            </div>
+            <button
+              onClick={handleVerifyChain}
+              disabled={verifyingChain}
+              className="px-3 py-1.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs flex items-center space-x-1.5 transition cursor-pointer"
+            >
+              <ShieldCheck className="w-3.5 h-3.5 text-emerald-400" />
+              <span>{verifyingChain ? 'Verifying Chain...' : 'Verify Cryptographic Integrity'}</span>
+            </button>
+          </div>
+
+          <p className="text-xs text-slate-500">
+            Every autonomous agent negotiation, PayPal idempotency call, spending check, and dispute mediation is hashed into an append-only cryptographic ledger.
+          </p>
+
+          <div className="p-4 rounded-2xl bg-slate-50 border border-slate-100 space-y-2 text-xs">
+            <div className="flex justify-between items-center">
+              <span className="text-slate-500">Ledger Immutability Status:</span>
+              <span
+                className={`font-bold px-2 py-0.5 rounded-full text-[10px] ${
+                  chainStatus?.valid === false
+                    ? 'bg-rose-100 text-rose-800'
+                    : 'bg-emerald-100 text-emerald-800'
+                }`}
+              >
+                {chainStatus
+                  ? chainStatus.valid
+                    ? `VERIFIED: ${chainStatus.checkedCount} BLOCKS INTACT`
+                    : `INTEGRITY COMPROMISED AT INDEX ${chainStatus.brokenIndex}`
+                  : 'READY FOR VERIFICATION'}
+              </span>
+            </div>
+            <div className="flex justify-between items-center">
+              <span className="text-slate-500">Hash Algorithm:</span>
+              <span className="font-mono text-[11px] text-slate-800 font-bold">SHA-256 (RFC 6234)</span>
+            </div>
+            <div className="flex justify-between items-center">
+              <span className="text-slate-500">PayPal Idempotency TTL:</span>
+              <span className="font-mono text-[11px] text-slate-800 font-bold">24 Hours Enforced</span>
             </div>
           </div>
         </div>

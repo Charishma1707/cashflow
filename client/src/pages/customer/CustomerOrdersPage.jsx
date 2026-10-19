@@ -2,10 +2,12 @@ import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { AgGridReact } from 'ag-grid-react';
 import 'ag-grid-community/styles/ag-grid.css';
 import 'ag-grid-community/styles/ag-theme-quartz.css';
-import { Package, Search, Download, Eye, X, CheckCircle2, Clock } from 'lucide-react';
+import { Package, Search, Download, Eye, X, CheckCircle2, Clock, FileCheck, Scale } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { getOrders, formatMoney } from '../../services/api';
 import LoadingSpinner from '../../components/LoadingSpinner';
+import MilestoneEscrowModal from '../../components/MilestoneEscrowModal';
+import DisputeMediationModal from '../../components/DisputeMediationModal';
 
 export default function CustomerOrdersPage() {
   const { currentCustomer } = useAuth();
@@ -13,6 +15,8 @@ export default function CustomerOrdersPage() {
   const [loading, setLoading] = useState(true);
   const [quickFilterText, setQuickFilterText] = useState('');
   const [selectedOrder, setSelectedOrder] = useState(null);
+  const [isMilestoneModalOpen, setIsMilestoneModalOpen] = useState(false);
+  const [isDisputeModalOpen, setIsDisputeModalOpen] = useState(false);
 
   const gridRef = useRef();
 
@@ -292,9 +296,48 @@ export default function CustomerOrdersPage() {
                   <span className="font-mono text-blue-600">{formatMoney(selectedOrder.totalCents)}</span>
                 </div>
               </div>
+
+              {/* Action Buttons for Milestones and Dispute */}
+              <div className="pt-3 border-t border-slate-100 flex items-center space-x-2">
+                {selectedOrder.milestones?.length > 0 && (
+                  <button
+                    onClick={() => setIsMilestoneModalOpen(true)}
+                    className="flex-1 py-2 px-3 rounded-xl bg-teal-50 hover:bg-teal-100 text-teal-800 font-bold text-xs flex items-center justify-center space-x-1 border border-teal-200 transition"
+                  >
+                    <FileCheck className="w-3.5 h-3.5" />
+                    <span>Inspect Milestones ({selectedOrder.milestones.length})</span>
+                  </button>
+                )}
+
+                <button
+                  onClick={() => setIsDisputeModalOpen(true)}
+                  className="flex-1 py-2 px-3 rounded-xl bg-purple-50 hover:bg-purple-100 text-purple-800 font-bold text-xs flex items-center justify-center space-x-1 border border-purple-200 transition"
+                >
+                  <Scale className="w-3.5 h-3.5" />
+                  <span>AI Dispute Mediation</span>
+                </button>
+              </div>
             </div>
           </div>
         </div>
+      )}
+
+      {/* Modals */}
+      {selectedOrder && (
+        <>
+          <MilestoneEscrowModal
+            isOpen={isMilestoneModalOpen}
+            onClose={() => setIsMilestoneModalOpen(false)}
+            order={selectedOrder}
+            onUpdated={() => loadOrders()}
+          />
+          <DisputeMediationModal
+            isOpen={isDisputeModalOpen}
+            onClose={() => setIsDisputeModalOpen(false)}
+            order={selectedOrder}
+            onMediated={() => loadOrders()}
+          />
+        </>
       )}
     </div>
   );

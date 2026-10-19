@@ -26,7 +26,15 @@ import {
   Pie,
 } from 'recharts';
 import { useAuth } from '../../context/AuthContext';
-import { getCustomerSpending, topUpAllowance, formatMoney } from '../../services/api';
+import {
+  getCustomerSpending,
+  topUpAllowance,
+  formatMoney,
+  getCustomerForecast,
+  getCustomerApprovals,
+  decideCustomerApproval,
+  triggerRecurringTopUp,
+} from '../../services/api';
 import StatCard from '../../components/StatCard';
 import LoadingSpinner from '../../components/LoadingSpinner';
 
@@ -41,6 +49,8 @@ const CATEGORY_DATA = [
 export default function CustomerSpendingPage() {
   const { currentCustomer } = useAuth();
   const [spending, setSpending] = useState(null);
+  const [forecast, setForecast] = useState(null);
+  const [approvals, setApprovals] = useState([]);
   const [loading, setLoading] = useState(true);
   const [quickFilterText, setQuickFilterText] = useState('');
   const [isTopUpOpen, setIsTopUpOpen] = useState(false);
@@ -52,8 +62,14 @@ export default function CustomerSpendingPage() {
     if (!currentCustomer?.email) return;
     setLoading(true);
     try {
-      const data = await getCustomerSpending(currentCustomer.email);
-      setSpending(data);
+      const [spendingData, forecastData, approvalsData] = await Promise.all([
+        getCustomerSpending(currentCustomer.email).catch(() => null),
+        getCustomerForecast().catch(() => null),
+        getCustomerApprovals().catch(() => []),
+      ]);
+      setSpending(spendingData);
+      setForecast(forecastData);
+      setApprovals(approvalsData || []);
     } catch (err) {
       console.warn('Failed to load spending:', err.message);
     } finally {
@@ -208,6 +224,93 @@ export default function CustomerSpendingPage() {
           <span>Top-Up Allowance</span>
         </button>
       </div>
+
+      {/* AI Burn Rate & Runway Forecast Banner (Prompt 10) */}
+      {forecast && (
+        <div
+          className={`rounded-3xl p-6 border shadow-xs transition ${
+            forecast.metrics?.isOverspendingRisk
+              ? 'bg-rose-50/70 border-rose-200 text-rose-950'
+              : 'bg-gradient-to-r from-blue-50 to-indigo-50 border-blue-200/80 text-blue-950'
+          }`}
+        >
+          <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+            <div className="space-y-1">
+              <div className="flex items-center space-x-2">
+                <span
+                  className={`px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider ${
+                    forecast.metrics?.isOverspendingRisk
+                      ? 'bg-rose-200 text-rose-900'
+                      : 'bg-blue-200 text-blue-900'
+                  }`}
+                >
+                  {forecast.metrics?.isOverspendingRisk ? 'Throttling Recommended' : 'Deterministic Cashflow Healthy'}
+                </span>
+                <span className="text-xs font-bold text-slate-500">
+                  Daily Burn: {formatMoney(forecast.metrics?.dailyBurnRateCents || 0)}/day
+                </span>
+              </div>
+              <h3 className="text-base font-black tracking-tight">{forecast.aiSummary}</h3>
+            </div>
+
+            <div className="flex items-center space-x-3 shrink-0">
+              <div className="text-right">
+                <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Recommended Daily Cap</p>
+                <p className="text-base font-black font-mono text-slate-900">
+                  {formatMoney(forecast.metrics?.recommendedDailyBudgetCents || 0)}/day
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Pending Approvals Queue (Prompt 3) */}
+      {approvals.length > 0 && (
+        <div className="bg-amber-50 rounded-3xl border border-amber-200 p-6 space-y-4">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center space-x-2">
+              <ShieldCheck className="w-5 h-5 text-amber-700" />
+              <h3 className="text-sm font-bold text-amber-950">
+                Purchases Requiring Human Approval ({approvals.length})
+              </h3>
+            </div>
+            <span className="text-xs text-amber-700 font-semibold">Spending Policy Engine Threshold Exceeded</span>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+            {approvals.map((req) => (
+              <div key={req._id} className="p-4 bg-white rounded-2xl border border-amber-200/80 shadow-xs flex items-center justify-between">
+                <div>
+                  <p className="text-xs font-bold text-slate-900">{req.merchantName}</p>
+                  <p className="text-xs text-slate-500">Category: {req.category}</p>
+                  <p className="text-sm font-black text-slate-900 mt-1">{formatMoney(req.amountCents)}</p>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <button
+                    onClick={async () => {
+                      await decideCustomerApproval(req._id, 'approved');
+                      loadSpending();
+                    }}
+                    className="px-3 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs"
+                  >
+                    Approve
+                  </button>
+                  <button
+                    onClick={async () => {
+                      await decideCustomerApproval(req._id, 'rejected');
+                      loadSpending();
+                    }}
+                    className="px-3 py-1.5 rounded-xl bg-slate-200 hover:bg-slate-300 text-slate-700 font-bold text-xs"
+                  >
+                    Reject
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
 
       {/* KPI Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">

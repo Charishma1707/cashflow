@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { Search, ShoppingBag, Plus, Check, Star, Filter, Sparkles, X } from 'lucide-react';
+import { Search, ShoppingBag, Plus, Check, Star, Filter, Sparkles, X, Bot } from 'lucide-react';
 import { getProducts, formatMoney } from '../../services/api';
 import { useCart } from '../../context/CartContext';
+import { useAuth } from '../../context/AuthContext';
 import LoadingSpinner from '../../components/LoadingSpinner';
+import NegotiationModal from '../../components/NegotiationModal';
 
 const CATEGORIES = [
   'All',
@@ -21,8 +23,10 @@ export default function CustomerShopPage() {
   const [selectedCategory, setSelectedCategory] = useState('All');
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedProduct, setSelectedProduct] = useState(null);
+  const [negotiationTarget, setNegotiationTarget] = useState(null);
   const [addedItemMap, setAddedItemMap] = useState({});
 
+  const { currentCustomer } = useAuth();
   const { addToCart } = useCart();
 
   const loadProducts = async () => {
@@ -179,9 +183,22 @@ export default function CustomerShopPage() {
                     </span>
                   </div>
 
-                  <button
-                    onClick={(e) => handleAddToCart(product, e)}
-                    disabled={product.stock <= 0}
+                  <div className="flex items-center space-x-2">
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setNegotiationTarget(product);
+                      }}
+                      className="flex items-center space-x-1 px-2.5 py-2 rounded-xl text-xs font-bold bg-indigo-50 hover:bg-indigo-100 text-indigo-700 transition border border-indigo-200"
+                      title="Negotiate Price with AI Agent"
+                    >
+                      <Bot className="w-3.5 h-3.5" />
+                      <span>Negotiate</span>
+                    </button>
+
+                    <button
+                      onClick={(e) => handleAddToCart(product, e)}
+                      disabled={product.stock <= 0}
                     className={`flex items-center space-x-1 px-3.5 py-2 rounded-xl text-xs font-bold transition-all shadow-xs ${
                       isAdded
                         ? 'bg-emerald-600 text-white'
@@ -202,6 +219,7 @@ export default function CustomerShopPage() {
                       </>
                     )}
                   </button>
+                  </div>
                 </div>
               </div>
             );
@@ -258,6 +276,14 @@ export default function CustomerShopPage() {
           </div>
         </div>
       )}
+
+      {/* Autonomous Negotiation Modal */}
+      <NegotiationModal
+        isOpen={Boolean(negotiationTarget)}
+        onClose={() => setNegotiationTarget(null)}
+        listing={negotiationTarget}
+        customerEmail={currentCustomer?.email}
+      />
     </div>
   );
 }

@@ -290,6 +290,108 @@ export const topUpAllowance = async (topUpData) => {
   return res.data;
 };
 
+// Marketplace Listings (Prompt 1)
+export const getMarketplaceListings = async (params = {}) => {
+  const res = await api.get('/listings', { params });
+  return res.data;
+};
+
+// Customer Spending Policy & Forecast (Prompts 3 & 10)
+export const getCustomerPolicy = async () => {
+  const res = await api.get('/customer-policy/me');
+  return res.data;
+};
+
+export const updateCustomerPolicy = async (policyData) => {
+  const res = await api.put('/customer-policy/me', policyData);
+  return res.data;
+};
+
+export const getCustomerForecast = async () => {
+  const res = await api.get('/customer-policy/forecast');
+  return res.data;
+};
+
+export const triggerRecurringTopUp = async (data = {}) => {
+  const res = await api.post('/customer-policy/recurring-topup', data);
+  return res.data;
+};
+
+export const updateRecurringSchedule = async (scheduleData) => {
+  const res = await api.put('/customer-policy/recurring-schedule', scheduleData);
+  return res.data;
+};
+
+export const getCustomerApprovals = async () => {
+  const res = await api.get('/customer-policy/approvals');
+  return res.data;
+};
+
+export const decideCustomerApproval = async (id, decision) => {
+  const res = await api.post(`/customer-policy/approvals/${id}/decide`, { decision });
+  return res.data;
+};
+
+// Seller Policy & Autonomous Capacity (Prompt 4)
+export const getSellerPolicy = async () => {
+  const res = await api.get('/seller-policy/me');
+  return res.data;
+};
+
+export const updateSellerPolicy = async (policyData) => {
+  const res = await api.put('/seller-policy/me', policyData);
+  return res.data;
+};
+
+// Autonomous Agent Bus & Negotiations (Prompts 5-8)
+export const createNegotiationSession = async (data) => {
+  const res = await api.post('/negotiations', data);
+  return res.data;
+};
+
+export const getNegotiationSession = async (sessionId) => {
+  const res = await api.get(`/negotiations/${sessionId}`);
+  return res.data;
+};
+
+export const sendNegotiationMessage = async (sessionId, messageData) => {
+  const res = await api.post(`/negotiations/${sessionId}/messages`, messageData);
+  return res.data;
+};
+
+// Milestone Escrow & Deliverable Verification (Prompt 9)
+export const getOrderMilestones = async (orderId) => {
+  const res = await api.get(`/orders/${orderId}/milestones`);
+  return res.data;
+};
+
+export const submitMilestoneDeliverable = async (orderId, milestoneIndex, deliverableData) => {
+  const res = await api.post(`/orders/${orderId}/milestones/${milestoneIndex}/submit`, deliverableData);
+  return res.data;
+};
+
+// Dispute Mediation Agent (Prompt 11)
+export const getOrderDispute = async (orderId) => {
+  const res = await api.get(`/disputes/${orderId}`);
+  return res.data;
+};
+
+export const mediateOrderDispute = async (orderId, disputeData) => {
+  const res = await api.post(`/disputes/${orderId}/mediate`, disputeData);
+  return res.data;
+};
+
+// Audit Trail & Cryptographic Chain Verification (Prompt 11)
+export const getAuditLogs = async (params = {}) => {
+  const res = await api.get('/audit-logs', { params });
+  return res.data;
+};
+
+export const verifyAuditChain = async () => {
+  const res = await api.get('/audit-logs/verify-chain');
+  return res.data;
+};
+
 export default api;
 
 
