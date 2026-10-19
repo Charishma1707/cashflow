@@ -24,6 +24,7 @@ import paypalWebhookRoutes from './routes/paypalWebhookRoutes.js';
 import spendingPolicyRoutes from './routes/spendingPolicyRoutes.js';
 import sellerPolicyRoutes from './routes/sellerPolicyRoutes.js';
 import agentBusRoutes from './routes/agentBusRoutes.js';
+import milestoneRoutes from './routes/milestoneRoutes.js';
 
 dotenv.config();
 
@@ -101,6 +102,7 @@ app.use('/api/webhooks', paypalWebhookRoutes);
 app.use('/api/customer-policy', spendingPolicyRoutes);
 app.use('/api/seller-policy', sellerPolicyRoutes);
 app.use('/api/negotiations', agentBusRoutes);
+app.use('/api/orders/:orderId/milestones', milestoneRoutes);
 
 // 404 Handler
 app.use((req, res) => {
