@@ -23,6 +23,7 @@ import auditLogRoutes from './routes/auditLogRoutes.js';
 import paypalWebhookRoutes from './routes/paypalWebhookRoutes.js';
 import spendingPolicyRoutes from './routes/spendingPolicyRoutes.js';
 import sellerPolicyRoutes from './routes/sellerPolicyRoutes.js';
+import agentBusRoutes from './routes/agentBusRoutes.js';
 
 dotenv.config();
 
@@ -99,6 +100,7 @@ app.use('/api/audit-logs', auditLogRoutes);
 app.use('/api/webhooks', paypalWebhookRoutes);
 app.use('/api/customer-policy', spendingPolicyRoutes);
 app.use('/api/seller-policy', sellerPolicyRoutes);
+app.use('/api/negotiations', agentBusRoutes);
 
 // 404 Handler
 app.use((req, res) => {
