@@ -81,4 +81,36 @@ AuditLogSchema.pre('save', function (next) {
   next();
 });
 
+AuditLogSchema.statics.verifyChainIntegrity = async function (filter = {}) {
+  const logs = await this.find(filter).sort({ timestamp: 1, _id: 1 });
+  let brokenIndex = -1;
+  let brokenLogId = null;
+
+  for (let i = 0; i < logs.length; i++) {
+    const log = logs[i];
+    const content = JSON.stringify({
+      timestamp: log.timestamp,
+      actorType: log.actorType,
+      actorId: log.actorId,
+      action: log.action,
+      entityType: log.entityType,
+      entityId: log.entityId,
+      details: log.details,
+    });
+    const expectedHash = crypto.createHash('sha256').update(content).digest('hex');
+    if (log.payloadHash !== expectedHash) {
+      brokenIndex = i;
+      brokenLogId = log._id;
+      break;
+    }
+  }
+
+  return {
+    valid: brokenIndex === -1,
+    checkedCount: logs.length,
+    brokenIndex: brokenIndex === -1 ? null : brokenIndex,
+    brokenLogId,
+  };
+};
+
 export const AuditLog = mongoose.model('AuditLog', AuditLogSchema);

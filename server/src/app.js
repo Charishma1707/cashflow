@@ -25,6 +25,7 @@ import spendingPolicyRoutes from './routes/spendingPolicyRoutes.js';
 import sellerPolicyRoutes from './routes/sellerPolicyRoutes.js';
 import agentBusRoutes from './routes/agentBusRoutes.js';
 import milestoneRoutes from './routes/milestoneRoutes.js';
+import disputeRoutes from './routes/disputeRoutes.js';
 
 dotenv.config();
 
@@ -103,6 +104,7 @@ app.use('/api/customer-policy', spendingPolicyRoutes);
 app.use('/api/seller-policy', sellerPolicyRoutes);
 app.use('/api/negotiations', agentBusRoutes);
 app.use('/api/orders/:orderId/milestones', milestoneRoutes);
+app.use('/api/disputes', disputeRoutes);
 
 // 404 Handler
 app.use((req, res) => {

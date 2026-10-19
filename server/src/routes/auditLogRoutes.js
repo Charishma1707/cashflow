@@ -3,6 +3,16 @@ import { AuditLog } from '../models/index.js';
 
 const router = Router();
 
+// Verify cryptographic hash integrity of the entire audit chain
+router.get('/verify-chain', async (req, res, next) => {
+  try {
+    const verification = await AuditLog.verifyChainIntegrity();
+    res.json(verification);
+  } catch (err) {
+    next(err);
+  }
+});
+
 // Search and retrieve append-only audit logs
 router.get('/', async (req, res, next) => {
   try {
