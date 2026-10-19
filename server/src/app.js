@@ -16,6 +16,10 @@ import forecastRoutes from './routes/forecastRoutes.js';
 import productRoutes from './routes/productRoutes.js';
 import orderRoutes from './routes/orderRoutes.js';
 import spendingRoutes from './routes/spendingRoutes.js';
+import authRoutes from './routes/authRoutes.js';
+import listingRoutes from './routes/listingRoutes.js';
+import marketplaceOrderRoutes from './routes/marketplaceOrderRoutes.js';
+import auditLogRoutes from './routes/auditLogRoutes.js';
 
 dotenv.config();
 
@@ -85,6 +89,10 @@ app.use('/api/forecast', forecastRoutes);
 app.use('/api/products', productRoutes);
 app.use('/api/orders', orderRoutes);
 app.use('/api/spending', spendingRoutes);
+app.use('/api/auth', authRoutes);
+app.use('/api/listings', listingRoutes);
+app.use('/api/marketplace-orders', marketplaceOrderRoutes);
+app.use('/api/audit-logs', auditLogRoutes);
 
 // 404 Handler
 app.use((req, res) => {

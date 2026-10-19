@@ -1,5 +1,6 @@
 import dotenv from 'dotenv';
-import { Business, Invoice, Expense, Payment, ServiceRequest, Product, Order, CustomerSpending } from '../models/index.js';
+import { Business, Invoice, Expense, Payment, ServiceRequest, Product, Order, CustomerSpending, User, Listing, AuditLog } from '../models/index.js';
+import crypto from 'crypto';
 import { connectDB, disconnectDB } from '../config/db.js';
 
 dotenv.config();
@@ -20,6 +21,9 @@ export async function seedDatabase(force = false) {
   await Product.deleteMany({});
   await Order.deleteMany({});
   await CustomerSpending.deleteMany({});
+  await User.deleteMany({});
+  await Listing.deleteMany({});
+  await AuditLog.deleteMany({});
   await Business.deleteMany({});
 
   // 2. Create Primary Business: FreshCart Groceries & Organic Mart
@@ -678,6 +682,193 @@ export async function seedDatabase(force = false) {
   ]);
 
   console.log('💳 Seeded 3 Customer Monthly Spending Profiles & Ledgers');
+
+  // 9. Seed Two-Sided Marketplace Users (Customers, Businesses, Admin)
+  const defaultHash = crypto.createHash('sha256').update('password123').digest('hex');
+
+  const customerUser = await User.create({
+    email: 'sarah.j@gmail.com',
+    passwordHash: defaultHash,
+    role: 'customer',
+    customerProfile: {
+      fullName: 'Sarah Jenkins',
+      phone: '+1 (555) 234-5678',
+      shippingAddress: {
+        street: '124 Blossom Lane',
+        city: 'Palo Alto',
+        state: 'CA',
+        postalCode: '94301',
+        country: 'US',
+      },
+      paypalVaultId: 'VAULT-SANDBOX-TOKEN-991',
+    },
+  });
+
+  const businessGoods = await User.create({
+    email: 'merchant@solecraft.com',
+    passwordHash: defaultHash,
+    role: 'business',
+    businessProfile: {
+      businessName: 'SoleCraft Footwear Co',
+      category: 'goods',
+      description: 'Handcrafted sustainable trail & athletic shoes.',
+      paypalMerchantId: 'MERCHANT-PP-SOLE-01',
+      rating: 4.9,
+      disputeRate: 0.1,
+      completedOrdersCount: 240,
+      verified: true,
+    },
+  });
+
+  const businessService = await User.create({
+    email: 'dev@apexstudio.io',
+    passwordHash: defaultHash,
+    role: 'business',
+    businessProfile: {
+      businessName: 'Apex Studio Engineering',
+      category: 'service',
+      description: 'Senior product designers and full-stack software engineers.',
+      paypalMerchantId: 'MERCHANT-PP-APEX-02',
+      rating: 5.0,
+      disputeRate: 0.0,
+      completedOrdersCount: 88,
+      verified: true,
+    },
+  });
+
+  const businessGrocery = await User.create({
+    email: 'billing@freshcartgroceries.com',
+    passwordHash: defaultHash,
+    role: 'business',
+    businessProfile: {
+      businessName: 'FreshCart Organic Mart',
+      category: 'grocery',
+      description: 'Local farm-fresh organic produce & artisanal grocery distribution.',
+      paypalMerchantId: 'MERCHANT-PP-FRESH-03',
+      rating: 4.8,
+      disputeRate: 0.2,
+      completedOrdersCount: 520,
+      verified: true,
+    },
+  });
+
+  const businessRental = await User.create({
+    email: 'fleet@bayrentals.com',
+    passwordHash: defaultHash,
+    role: 'business',
+    businessProfile: {
+      businessName: 'BayArea Production Rentals',
+      category: 'rental',
+      description: 'Commercial 6K camera rigs, lighting kits, and cinema gear.',
+      paypalMerchantId: 'MERCHANT-PP-BAY-04',
+      rating: 4.9,
+      disputeRate: 0.0,
+      completedOrdersCount: 110,
+      verified: true,
+    },
+  });
+
+  const adminUser = await User.create({
+    email: 'admin@marketplace.local',
+    passwordHash: defaultHash,
+    role: 'admin',
+  });
+
+  console.log('👥 Seeded Marketplace Users (Customer, 4 Business Categories, Admin)');
+
+  // 10. Seed Multi-Type Listings with Price Floors, Ceilings, and Milestone Templates
+  const listings = await Listing.create([
+    {
+      businessId: businessGoods._id,
+      title: 'SoleCraft TrailPro Elite Running Shoes',
+      description: 'Vibram outsole, waterproof breathable membrane, and ultralight responsive carbon-fiber plate.',
+      category: 'goods',
+      type: 'one_time_goods',
+      priceCents: 12000, // $120.00
+      priceFloorCents: 10000, // $100.00 (min acceptable price in negotiation)
+      priceCeilingCents: 14000, // $140.00
+      currency: 'USD',
+      stockOrCapacity: 35,
+      deliveryTurnaroundDays: 2,
+      imageUrl: 'https://images.unsplash.com/photo-1542291026-7eec264c27ff?auto=format&fit=crop&w=600&q=80',
+      location: { city: 'Portland', country: 'US' },
+      rating: 4.9,
+      status: 'active',
+    },
+    {
+      businessId: businessGrocery._id,
+      title: 'Weekly Farm-Fresh Organic Veggie Box',
+      description: 'Curated box of heirloom produce, crisp greens, avocados, berries, and microgreens harvested same-day.',
+      category: 'grocery',
+      type: 'recurring_plan',
+      priceCents: 4500, // $45.00 / month
+      priceFloorCents: 4000, // $40.00
+      priceCeilingCents: 5000, // $50.00
+      planOptions: [3, 6, 12],
+      stockOrCapacity: 50,
+      deliveryTurnaroundDays: 1,
+      imageUrl: 'https://images.unsplash.com/photo-1610348725531-843dff563e2c?auto=format&fit=crop&w=600&q=80',
+      location: { city: 'San Francisco', country: 'US' },
+      rating: 4.8,
+      status: 'active',
+    },
+    {
+      businessId: businessService._id,
+      title: 'Full-Stack Next.js & Stripe SaaS Web App',
+      description: 'End-to-end design, React/Next.js frontend, Python FastAPI backend, database migrations, and CI/CD deployment.',
+      category: 'service',
+      type: 'milestone_service',
+      priceCents: 120000, // $1,200.00
+      priceFloorCents: 100000, // $1,000.00 (min floor for negotiation)
+      priceCeilingCents: 150000, // $1,500.00
+      deliveryTurnaroundDays: 14,
+      milestoneTemplates: [
+        {
+          milestoneIndex: 1,
+          title: 'Architecture Spec & Figma Wireframes',
+          percentage: 30,
+          deliverableType: 'design',
+          checklistCriteria: ['System architecture diagram', 'Interactive Figma prototype', 'Database schema signoff'],
+        },
+        {
+          milestoneIndex: 2,
+          title: 'Frontend & Backend API Implementation',
+          percentage: 40,
+          deliverableType: 'code',
+          checklistCriteria: ['All endpoints implemented', 'Automated unit tests passing', 'Auth flow working'],
+        },
+        {
+          milestoneIndex: 3,
+          title: 'Production Deployment & Acceptance Tests',
+          percentage: 30,
+          deliverableType: 'asset',
+          checklistCriteria: ['Deployed to Render/Cloud', 'E2E tests pass', 'Documentation delivered'],
+        },
+      ],
+      imageUrl: 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&w=600&q=80',
+      location: { city: 'Austin', country: 'US' },
+      rating: 5.0,
+      status: 'active',
+    },
+    {
+      businessId: businessRental._id,
+      title: 'Cinema 6K Camera & Lighting Production Rig',
+      description: 'Full RED Komodo 6K cinema package, cinema prime lens set, wireless video transmitter, and portable LED lighting kit.',
+      category: 'rental',
+      type: 'rental',
+      priceCents: 8500, // $85.00 / day
+      priceFloorCents: 7000, // $70.00
+      priceCeilingCents: 10000, // $100.00
+      stockOrCapacity: 4,
+      deliveryTurnaroundDays: 1,
+      imageUrl: 'https://images.unsplash.com/photo-1512790182412-b19e6d62bc39?auto=format&fit=crop&w=600&q=80',
+      location: { city: 'San Francisco', country: 'US' },
+      rating: 4.9,
+      status: 'active',
+    },
+  ]);
+
+  console.log(`🏷️ Seeded ${listings.length} Typed Marketplace Listings with Negotiation Bounds`);
   console.log('✨ Demo database seeded successfully!');
 }
 

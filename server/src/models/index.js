@@ -6,3 +6,6 @@ export { ServiceRequest } from './ServiceRequest.js';
 export { Product } from './Product.js';
 export { Order } from './Order.js';
 export { CustomerSpending } from './CustomerSpending.js';
+export { User } from './User.js';
+export { Listing } from './Listing.js';
+export { AuditLog } from './AuditLog.js';
