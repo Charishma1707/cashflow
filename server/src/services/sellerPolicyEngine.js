@@ -93,9 +93,11 @@ export class SellerPolicyEngine {
     // 3. Rule: BUYER_DISPUTE_RATE_TOO_HIGH
     // Check buyer's declared or recorded dispute rate against cutoff (e.g. 0.05 = 5%)
     let resolvedDisputeRate = Number(buyerDisputeRate) || 0;
-    if (buyerId) {
+    if (buyerId && resolvedDisputeRate === 0) {
       const buyerUser = await User.findById(buyerId);
-      if (buyerUser?.businessProfile?.disputeRate !== undefined) {
+      if (buyerUser?.customerProfile?.disputeRate !== undefined) {
+        resolvedDisputeRate = buyerUser.customerProfile.disputeRate;
+      } else if (buyerUser?.businessProfile?.disputeRate !== undefined) {
         resolvedDisputeRate = buyerUser.businessProfile.disputeRate;
       }
     }
