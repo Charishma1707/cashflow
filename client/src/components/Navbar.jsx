@@ -13,7 +13,7 @@ export default function Navbar({ business, paypalStatus, onOpenInvoiceModal }) {
     <header className="h-16 border-b border-slate-200/90 bg-white/90 backdrop-blur-md px-8 flex items-center justify-between sticky top-0 z-20 shadow-xs">
       <div className="flex items-center space-x-3">
         <h2 className="text-lg font-bold text-slate-900 tracking-tight">
-          {business?.name || 'Acme Studio'}
+          {business?.name || 'FreshCart Groceries & Mart'}
         </h2>
         <span className="text-xs px-2.5 py-0.5 rounded-full bg-slate-100 text-slate-700 font-semibold border border-slate-200">
           {business?.currency || 'USD'}
@@ -40,18 +40,41 @@ export default function Navbar({ business, paypalStatus, onOpenInvoiceModal }) {
           {currentDate}
         </div>
 
+        {/* Role Switcher */}
+        <div className="flex items-center space-x-1.5 bg-slate-100 p-1 rounded-xl border border-slate-200">
+          <a
+            href="/"
+            title="Return to Welcome Selection Gateway"
+            className="flex items-center space-x-1 px-2 py-1 rounded-lg text-xs font-semibold text-slate-500 hover:text-slate-900 transition-colors"
+          >
+            <span>🚪 Switch</span>
+          </a>
+          <a
+            href="/merchant"
+            className="flex items-center space-x-1 px-2.5 py-1 rounded-lg text-xs font-bold text-slate-700 hover:text-blue-600 transition-colors"
+          >
+            <span>🏪 Grocer Merchant</span>
+          </a>
+          <a
+            href="/client"
+            className="flex items-center space-x-1 px-2.5 py-1 rounded-lg text-xs font-bold text-white bg-emerald-600 hover:bg-emerald-700 transition-colors shadow-2xs"
+          >
+            <span>🛒 Customer Store</span>
+          </a>
+        </div>
+
         <a
           href="/assistant"
-          className="flex items-center space-x-1.5 px-3.5 py-2 rounded-xl text-xs font-semibold text-blue-700 bg-blue-50 border border-blue-200 hover:bg-blue-100 transition-all cursor-pointer"
+          className="flex items-center space-x-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold text-blue-700 bg-blue-50 border border-blue-200 hover:bg-blue-100 transition-all cursor-pointer"
         >
           <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-          <span>MCP Assistant</span>
+          <span>MCP Copilot</span>
         </a>
 
         {onOpenInvoiceModal && (
           <button
             onClick={onOpenInvoiceModal}
-            className="flex items-center space-x-1.5 px-4 py-2 rounded-xl text-xs font-semibold text-white bg-gradient-to-r from-blue-600 via-indigo-600 to-blue-700 hover:from-blue-700 hover:to-indigo-700 shadow-md shadow-blue-500/25 transition-all cursor-pointer"
+            className="flex items-center space-x-1.5 px-3.5 py-2 rounded-xl text-xs font-semibold text-white bg-gradient-to-r from-blue-600 via-indigo-600 to-blue-700 hover:from-blue-700 hover:to-indigo-700 shadow-md shadow-blue-500/25 transition-all cursor-pointer"
           >
             <Plus className="w-3.5 h-3.5" />
             <span>New Invoice</span>

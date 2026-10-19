@@ -10,9 +10,14 @@ import {
   Tag,
   DollarSign,
   AlertCircle,
+  CreditCard,
+  Layers,
+  Sparkles,
+  ShieldCheck,
 } from 'lucide-react';
 import LoadingSpinner from '../components/LoadingSpinner';
 import EmptyState from '../components/EmptyState';
+import SubscriptionPayModal from '../components/SubscriptionPayModal';
 import { getExpenses, updateExpenseStatus, deleteExpense, formatMoney } from '../services/api';
 
 const STATUS_FILTERS = ['ALL', 'SCHEDULED', 'PAID', 'CANCELLED'];
@@ -21,6 +26,7 @@ export default function ExpensesPage({ onOpenExpenseModal }) {
   const [expenses, setExpenses] = useState([]);
   const [loading, setLoading] = useState(true);
   const [statusFilter, setStatusFilter] = useState('ALL');
+  const [selectedSubscription, setSelectedSubscription] = useState(null);
   const [error, setError] = useState(null);
 
   const loadExpenses = async () => {
@@ -71,14 +77,28 @@ export default function ExpensesPage({ onOpenExpenseModal }) {
     .filter((e) => e.status === 'PAID')
     .reduce((sum, e) => sum + e.amount, 0);
 
+  // Subscriptions filter
+  const subscriptions = expenses.filter(
+    (e) => e.isSubscription || e.category === 'Software & Subscriptions'
+  );
+
   return (
-    <div className="p-8 space-y-6 max-w-7xl mx-auto">
+    <div className="p-8 space-y-8 max-w-7xl mx-auto animate-in fade-in duration-300">
       {/* Header */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-extrabold text-slate-900 tracking-tight">Expenses & Obligations</h1>
-          <p className="text-xs text-slate-500 font-medium mt-1">
-            Track business operating costs, subscriptions, contractors, and upcoming cash outflows
+          <div className="flex items-center space-x-2">
+            <span className="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-rose-100 text-rose-700 uppercase">
+              Financial Outflows
+            </span>
+            <span className="text-xs text-slate-400">•</span>
+            <span className="text-xs text-slate-500 font-medium">SaaS Subscriptions & OpEx</span>
+          </div>
+          <h1 className="text-2xl font-black text-slate-900 tracking-tight mt-1">
+            Expenses & SaaS Subscriptions
+          </h1>
+          <p className="text-sm text-slate-500 font-medium mt-1">
+            Manage operational costs and pay software licenses (Canva, Figma, AWS, Adobe) required to provide client services.
           </p>
         </div>
         <button
@@ -88,6 +108,82 @@ export default function ExpensesPage({ onOpenExpenseModal }) {
           <Plus className="w-3.5 h-3.5" />
           <span>Record Expense</span>
         </button>
+      </div>
+
+      {/* SaaS Subscriptions Hub with PayPal Checkout */}
+      <div className="bg-gradient-to-r from-slate-900 via-indigo-950 to-blue-950 text-white rounded-2xl p-6 shadow-lg border border-indigo-900/40 space-y-4">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+          <div className="flex items-center space-x-2.5">
+            <div className="w-9 h-9 rounded-xl bg-indigo-500/30 flex items-center justify-center text-indigo-300 border border-indigo-400/30 shadow-xs">
+              <Layers className="w-5 h-5" />
+            </div>
+            <div>
+              <h3 className="font-bold text-base tracking-wide">
+                Operating SaaS Subscriptions (Canva, Figma, AWS, Adobe)
+              </h3>
+              <p className="text-xs text-indigo-200">
+                Software tools required to produce deliverables for clients. Settle instantly via PayPal Sandbox.
+              </p>
+            </div>
+          </div>
+          <div className="flex items-center space-x-2 text-xs text-emerald-400 font-semibold bg-emerald-500/10 px-3 py-1 rounded-full border border-emerald-500/20">
+            <ShieldCheck className="w-3.5 h-3.5" />
+            <span>PayPal Sandbox Orders Integrated</span>
+          </div>
+        </div>
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3.5 pt-2">
+          {subscriptions.map((sub) => {
+            const isPaid = sub.status === 'PAID';
+            return (
+              <div
+                key={sub._id}
+                className="bg-white/10 backdrop-blur-md rounded-xl p-4 border border-white/15 hover:border-indigo-400/50 transition-all flex flex-col justify-between"
+              >
+                <div className="space-y-1.5">
+                  <div className="flex items-center justify-between">
+                    <span className="font-bold text-sm text-white">
+                      {sub.platform || sub.vendor}
+                    </span>
+                    <span
+                      className={`px-2 py-0.5 rounded-full text-[10px] font-bold ${
+                        isPaid
+                          ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30'
+                          : 'bg-amber-500/20 text-amber-300 border border-amber-500/30'
+                      }`}
+                    >
+                      {sub.status}
+                    </span>
+                  </div>
+                  <p className="text-xs text-indigo-200 line-clamp-2">{sub.description}</p>
+                  <div className="text-[11px] text-indigo-300 font-mono">
+                    Due: {new Date(sub.dueDate).toLocaleDateString()} ({sub.frequency || 'MONTHLY'})
+                  </div>
+                </div>
+
+                <div className="pt-3 mt-3 border-t border-white/10 flex items-center justify-between">
+                  <div className="font-extrabold text-base text-white">
+                    {formatMoney(sub.amount)}
+                  </div>
+                  {isPaid ? (
+                    <span className="text-[11px] font-semibold text-emerald-400 flex items-center space-x-1">
+                      <CheckCircle className="w-3.5 h-3.5" />
+                      <span>Active</span>
+                    </span>
+                  ) : (
+                    <button
+                      onClick={() => setSelectedSubscription(sub)}
+                      className="flex items-center space-x-1 px-3 py-1.5 rounded-lg text-xs font-bold bg-amber-400 text-slate-950 hover:bg-amber-300 shadow-xs transition-all cursor-pointer"
+                    >
+                      <CreditCard className="w-3.5 h-3.5" />
+                      <span>Pay via PayPal</span>
+                    </button>
+                  )}
+                </div>
+              </div>
+            );
+          })}
+        </div>
       </div>
 
       {/* Summary Pills */}
@@ -157,7 +253,7 @@ export default function ExpensesPage({ onOpenExpenseModal }) {
                 <tr>
                   <th className="py-3 px-4">Description</th>
                   <th className="py-3 px-4">Category</th>
-                  <th className="py-3 px-4">Vendor</th>
+                  <th className="py-3 px-4">Vendor / Tool</th>
                   <th className="py-3 px-4">Due Date</th>
                   <th className="py-3 px-4 text-right">Amount</th>
                   <th className="py-3 px-4 text-center">Status</th>
@@ -178,7 +274,9 @@ export default function ExpensesPage({ onOpenExpenseModal }) {
                         {exp.category}
                       </span>
                     </td>
-                    <td className="py-3.5 px-4 text-slate-700 font-medium">{exp.vendor || '—'}</td>
+                    <td className="py-3.5 px-4 text-slate-700 font-medium">
+                      {exp.platform || exp.vendor || '—'}
+                    </td>
                     <td className="py-3.5 px-4 text-slate-500 font-medium">
                       {new Date(exp.dueDate).toLocaleDateString()}
                     </td>
@@ -199,6 +297,15 @@ export default function ExpensesPage({ onOpenExpenseModal }) {
                       </span>
                     </td>
                     <td className="py-3.5 px-4 text-right space-x-1">
+                      {exp.status === 'SCHEDULED' && (
+                        <button
+                          onClick={() => setSelectedSubscription(exp)}
+                          className="px-2 py-1 rounded-md text-[11px] font-bold bg-amber-100 text-amber-800 hover:bg-amber-200 transition-colors cursor-pointer mr-1"
+                          title="Pay via PayPal Sandbox"
+                        >
+                          Pay PayPal
+                        </button>
+                      )}
                       {exp.status === 'SCHEDULED' && (
                         <button
                           onClick={() => handleStatusChange(exp._id, 'PAID')}
@@ -232,6 +339,17 @@ export default function ExpensesPage({ onOpenExpenseModal }) {
           </div>
         </div>
       )}
+
+      {/* Subscription Pay Modal */}
+      <SubscriptionPayModal
+        expense={selectedSubscription}
+        isOpen={Boolean(selectedSubscription)}
+        onClose={() => setSelectedSubscription(null)}
+        onPaymentSuccess={() => {
+          loadExpenses();
+          setSelectedSubscription(null);
+        }}
+      />
     </div>
   );
 }

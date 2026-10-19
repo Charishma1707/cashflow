@@ -1,190 +1,103 @@
-import React, { useState, useEffect } from 'react';
-import { BrowserRouter, Routes, Route, useNavigate } from 'react-router-dom';
-import Sidebar from './components/Sidebar';
-import Navbar from './components/Navbar';
-import DashboardPage from './pages/DashboardPage';
-import InvoicesPage from './pages/InvoicesPage';
-import ExpensesPage from './pages/ExpensesPage';
-import PaymentsPage from './pages/PaymentsPage';
-import SettingsPage from './pages/SettingsPage';
-import McpAssistantPage from './pages/McpAssistantPage';
-import InvoiceModal from './components/InvoiceModal';
-import InvoiceDetailModal from './components/InvoiceDetailModal';
-import ExpenseModal from './components/ExpenseModal';
-import PaymentReceiptModal from './components/PaymentReceiptModal';
-import { getBusinessSettings, getPayPalStatus } from './services/api';
+import React from 'react';
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { PayPalScriptProvider } from '@paypal/react-paypal-js';
 
-function AppContent() {
-  const [business, setBusiness] = useState(null);
-  const [paypalStatus, setPaypalStatus] = useState(null);
-  const [selectedInvoice, setSelectedInvoice] = useState(null);
-  const [isInvoiceModalOpen, setIsInvoiceModalOpen] = useState(false);
-  const [isExpenseModalOpen, setIsExpenseModalOpen] = useState(false);
-  const [paymentReceipt, setPaymentReceipt] = useState(null);
-  const [refreshTrigger, setRefreshTrigger] = useState(0);
+import { AuthProvider } from './context/AuthContext';
+import { CartProvider } from './context/CartContext';
 
-  const navigate = useNavigate();
+// Layouts
+import CustomerLayout from './layouts/CustomerLayout';
+import OwnerLayout from './layouts/OwnerLayout';
 
-  const refreshGlobalData = async (attempt = 1) => {
-    try {
-      const [biz, pp] = await Promise.all([getBusinessSettings(), getPayPalStatus()]);
-      if (biz) setBusiness(biz);
-      if (pp) setPaypalStatus(pp);
-    } catch (err) {
-      console.warn('Initial data load warning:', err.message);
-      if (attempt < 4) {
-        setTimeout(() => refreshGlobalData(attempt + 1), 4000);
-      }
-    }
-  };
+// Gateway
+import WelcomeGatewayPage from './pages/WelcomeGatewayPage';
 
-  useEffect(() => {
-    refreshGlobalData();
-  }, [refreshTrigger]);
+// Customer Pages
+import CustomerHomePage from './pages/customer/CustomerHomePage';
+import CustomerShopPage from './pages/customer/CustomerShopPage';
+import CustomerCheckoutPage from './pages/customer/CustomerCheckoutPage';
+import CustomerOrdersPage from './pages/customer/CustomerOrdersPage';
+import CustomerPaymentsPage from './pages/customer/CustomerPaymentsPage';
+import CustomerInvoicesPage from './pages/customer/CustomerInvoicesPage';
+import CustomerSpendingPage from './pages/customer/CustomerSpendingPage';
+import CustomerAiPage from './pages/customer/CustomerAiPage';
+import CustomerSettingsPage from './pages/customer/CustomerSettingsPage';
 
-  const triggerRefresh = () => {
-    setRefreshTrigger((prev) => prev + 1);
-  };
+// Owner Pages
+import OwnerOverviewPage from './pages/owner/OwnerOverviewPage';
+import OwnerProductsPage from './pages/owner/OwnerProductsPage';
+import OwnerOrdersPage from './pages/owner/OwnerOrdersPage';
+import OwnerTransactionsPage from './pages/owner/OwnerTransactionsPage';
+import OwnerCustomersPage from './pages/owner/OwnerCustomersPage';
+import OwnerInvoicesPage from './pages/owner/OwnerInvoicesPage';
+import OwnerCashFlowPage from './pages/owner/OwnerCashFlowPage';
+import OwnerAnalyticsPage from './pages/owner/OwnerAnalyticsPage';
+import OwnerAiPage from './pages/owner/OwnerAiPage';
+import OwnerSettingsPage from './pages/owner/OwnerSettingsPage';
 
-  const handlePaymentSuccess = (result) => {
-    // 1. Close invoice detail modal
-    setSelectedInvoice(null);
-    // 2. Open payment celebratory receipt modal
-    setPaymentReceipt(result);
-    // 3. Trigger global data refresh
-    triggerRefresh();
-  };
-
-  return (
-    <div className="flex min-h-screen bg-[#f8fafc] text-slate-900 selection:bg-blue-500/20 selection:text-blue-600">
-      {/* Persistent Left Sidebar */}
-      <Sidebar business={business} />
-
-      {/* Main Content Area */}
-      <div className="flex-1 flex flex-col min-w-0">
-        <Navbar
-          business={business}
-          paypalStatus={paypalStatus}
-          onOpenInvoiceModal={() => setIsInvoiceModalOpen(true)}
-        />
-
-        <main className="flex-1 overflow-y-auto">
-          <Routes>
-            <Route
-              path="/"
-              element={
-                <DashboardPage
-                  key={`dash-${refreshTrigger}`}
-                  onOpenInvoiceModal={() => setIsInvoiceModalOpen(true)}
-                  onOpenExpenseModal={() => setIsExpenseModalOpen(true)}
-                  onSelectInvoice={(inv) => setSelectedInvoice(inv)}
-                  onDataLoaded={(summary) => {
-                    if (summary?.business) setBusiness(summary.business);
-                  }}
-                />
-              }
-            />
-            <Route
-              path="/assistant"
-              element={
-                <McpAssistantPage
-                  onOpenInvoiceModal={() => setIsInvoiceModalOpen(true)}
-                />
-              }
-            />
-            <Route
-              path="/invoices"
-              element={
-                <InvoicesPage
-                  key={`inv-${refreshTrigger}`}
-                  onOpenInvoiceModal={() => setIsInvoiceModalOpen(true)}
-                  onSelectInvoice={(inv) => setSelectedInvoice(inv)}
-                />
-              }
-            />
-            <Route
-              path="/expenses"
-              element={
-                <ExpensesPage
-                  key={`exp-${refreshTrigger}`}
-                  onOpenExpenseModal={() => setIsExpenseModalOpen(true)}
-                />
-              }
-            />
-            <Route
-              path="/payments"
-              element={
-                <PaymentsPage
-                  key={`pay-${refreshTrigger}`}
-                  onSelectInvoice={(inv) => setSelectedInvoice(inv)}
-                />
-              }
-            />
-            <Route
-              path="/settings"
-              element={
-                <SettingsPage
-                  onSettingsUpdated={(updated) => {
-                    setBusiness(updated);
-                    triggerRefresh();
-                  }}
-                />
-              }
-            />
-          </Routes>
-        </main>
-      </div>
-
-      {/* Global Modals */}
-      {isInvoiceModalOpen && (
-        <InvoiceModal
-          onClose={() => setIsInvoiceModalOpen(false)}
-          onInvoiceCreated={(newInv) => {
-            triggerRefresh();
-            setSelectedInvoice(newInv);
-          }}
-        />
-      )}
-
-      {isExpenseModalOpen && (
-        <ExpenseModal
-          onClose={() => setIsExpenseModalOpen(false)}
-          onExpenseCreated={() => {
-            triggerRefresh();
-          }}
-        />
-      )}
-
-      {selectedInvoice && (
-        <InvoiceDetailModal
-          invoice={selectedInvoice}
-          onClose={() => setSelectedInvoice(null)}
-          onPaymentSuccess={handlePaymentSuccess}
-          onStatusUpdated={(updated) => {
-            setSelectedInvoice(updated);
-            triggerRefresh();
-          }}
-        />
-      )}
-
-      {paymentReceipt && (
-        <PaymentReceiptModal
-          result={paymentReceipt}
-          onClose={() => setPaymentReceipt(null)}
-          onViewInvoice={(inv) => {
-            setSelectedInvoice(inv);
-            navigate('/invoices');
-          }}
-        />
-      )}
-    </div>
-  );
-}
+const initialPayPalOptions = {
+  clientId: import.meta.env.VITE_PAYPAL_CLIENT_ID || 'test',
+  currency: 'USD',
+  intent: 'capture',
+  components: 'buttons',
+};
 
 export default function App() {
   return (
-    <BrowserRouter>
-      <AppContent />
-    </BrowserRouter>
+    <PayPalScriptProvider options={initialPayPalOptions}>
+      <AuthProvider>
+        <CartProvider>
+          <BrowserRouter>
+            <Routes>
+              {/* Entry Gateway */}
+              <Route path="/" element={<WelcomeGatewayPage />} />
+
+              {/* Customer Portal (Nested Routes with Breadcrumbs) */}
+              <Route path="/customer" element={<CustomerLayout />}>
+                <Route index element={<Navigate to="/customer/home" replace />} />
+                <Route path="home" element={<CustomerHomePage />} />
+                <Route path="shop" element={<CustomerShopPage />} />
+                <Route path="checkout" element={<CustomerCheckoutPage />} />
+                <Route path="orders" element={<CustomerOrdersPage />} />
+                <Route path="payments" element={<CustomerPaymentsPage />} />
+                <Route path="invoices" element={<CustomerInvoicesPage />} />
+                <Route path="spending" element={<CustomerSpendingPage />} />
+                <Route path="ai" element={<CustomerAiPage />} />
+                <Route path="settings" element={<CustomerSettingsPage />} />
+              </Route>
+
+              {/* Owner Portal (Nested Routes with Breadcrumbs) */}
+              <Route path="/owner" element={<OwnerLayout />}>
+                <Route index element={<Navigate to="/owner/overview" replace />} />
+                <Route path="overview" element={<OwnerOverviewPage />} />
+                <Route path="products" element={<OwnerProductsPage />} />
+                <Route path="orders" element={<OwnerOrdersPage />} />
+                <Route path="transactions" element={<OwnerTransactionsPage />} />
+                <Route path="customers" element={<OwnerCustomersPage />} />
+                <Route path="invoices" element={<OwnerInvoicesPage />} />
+                <Route path="cash-flow" element={<OwnerCashFlowPage />} />
+                <Route path="analytics" element={<OwnerAnalyticsPage />} />
+                <Route path="ai" element={<OwnerAiPage />} />
+                <Route path="settings" element={<OwnerSettingsPage />} />
+              </Route>
+
+              {/* Legacy Backward Compatibility Redirects */}
+              <Route path="/merchant" element={<Navigate to="/owner/overview" replace />} />
+              <Route path="/client" element={<Navigate to="/customer/home" replace />} />
+              <Route path="/client-portal" element={<Navigate to="/customer/home" replace />} />
+              <Route path="/forecast" element={<Navigate to="/owner/cash-flow" replace />} />
+              <Route path="/assistant" element={<Navigate to="/owner/ai" replace />} />
+              <Route path="/invoices" element={<Navigate to="/owner/invoices" replace />} />
+              <Route path="/expenses" element={<Navigate to="/owner/cash-flow" replace />} />
+              <Route path="/payments" element={<Navigate to="/owner/transactions" replace />} />
+              <Route path="/settings" element={<Navigate to="/owner/settings" replace />} />
+
+              {/* Catch-all */}
+              <Route path="*" element={<Navigate to="/" replace />} />
+            </Routes>
+          </BrowserRouter>
+        </CartProvider>
+      </AuthProvider>
+    </PayPalScriptProvider>
   );
 }

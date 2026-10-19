@@ -1,7 +1,7 @@
 import React from 'react';
 import { NavLink } from 'react-router-dom';
 import {
-  LayoutDashboard,
+  Store,
   Receipt,
   ArrowDownCircle,
   CreditCard,
@@ -10,15 +10,20 @@ import {
   TrendingUp,
   Sparkles,
   Bot,
+  ShoppingCart,
+  Apple,
 } from 'lucide-react';
 
 export default function Sidebar({ business }) {
   const navItems = [
-    { name: 'Dashboard', path: '/', icon: LayoutDashboard },
-    { name: 'AI Assistant', path: '/assistant', icon: Bot, badge: 'MCP' },
-    { name: 'Invoices', path: '/invoices', icon: Receipt },
-    { name: 'Expenses', path: '/expenses', icon: ArrowDownCircle },
-    { name: 'Payments', path: '/payments', icon: CreditCard },
+    { name: 'Store Dashboard', path: '/merchant', icon: Store },
+    { name: 'Growth Forecast', path: '/forecast', icon: TrendingUp, badge: '6/12M' },
+    { name: 'AI Copilot', path: '/assistant', icon: Bot, badge: 'MCP' },
+    { name: 'Wholesale Invoices', path: '/invoices', icon: Receipt },
+    { name: 'Grocery Orders', path: '/service-requests', icon: Sparkles, badge: 'Orders' },
+    { name: 'Tool Subscriptions', path: '/expenses', icon: ArrowDownCircle },
+    { name: 'Payment Ledger', path: '/payments', icon: CreditCard },
+    { name: 'Customer Store', path: '/client', icon: ShoppingCart, badge: 'Client' },
     { name: 'Settings', path: '/settings', icon: Settings },
   ];
 
@@ -26,15 +31,15 @@ export default function Sidebar({ business }) {
     <aside className="w-64 bg-white/95 backdrop-blur-md border-r border-slate-200/90 flex flex-col shrink-0 h-screen sticky top-0 shadow-sm">
       {/* Brand Header */}
       <div className="p-6 border-b border-slate-100 flex items-center space-x-3">
-        <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-blue-600 via-indigo-600 to-purple-600 flex items-center justify-center shadow-md shadow-blue-500/25 text-white">
-          <TrendingUp className="w-5 h-5" />
+        <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-emerald-600 via-teal-600 to-emerald-700 flex items-center justify-center shadow-md shadow-emerald-500/25 text-white">
+          <Apple className="w-5 h-5" />
         </div>
         <div>
           <div className="flex items-center space-x-1.5">
-            <h1 className="font-extrabold text-base tracking-tight text-slate-900">CashFlow</h1>
-            <span className="bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent font-black text-sm tracking-wider">COPILOT</span>
+            <h1 className="font-extrabold text-base tracking-tight text-slate-900">FreshCart</h1>
+            <span className="bg-gradient-to-r from-emerald-600 to-teal-600 bg-clip-text text-transparent font-black text-sm tracking-wider">GROCERS</span>
           </div>
-          <span className="text-[11px] text-slate-500 font-medium block">Financial Workspace</span>
+          <span className="text-[11px] text-slate-500 font-medium block">Organic Mart & Wholesale</span>
         </div>
       </div>
 
@@ -78,7 +83,7 @@ export default function Sidebar({ business }) {
         <div className="bg-white p-3.5 rounded-xl border border-blue-100 shadow-sm">
           <div className="flex items-center justify-between mb-1.5">
             <span className="text-xs font-bold text-slate-800 truncate">
-              {business?.name || 'Acme Studio'}
+              {business?.name || 'FreshCart Groceries & Mart'}
             </span>
             <span className="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
               Active

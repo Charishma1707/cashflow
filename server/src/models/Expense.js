@@ -57,6 +57,32 @@ const ExpenseSchema = new mongoose.Schema(
       type: String,
       trim: true,
     },
+    isSubscription: {
+      type: Boolean,
+      default: false,
+      index: true,
+    },
+    frequency: {
+      type: String,
+      enum: ['MONTHLY', 'ANNUAL', 'QUARTERLY', 'ONE_TIME'],
+      default: 'MONTHLY',
+    },
+    platform: {
+      type: String,
+      enum: ['Figma', 'Canva', 'AWS', 'Adobe', 'OpenAI', 'Google', 'GitHub', 'Other'],
+      default: 'Other',
+    },
+    paypalOrderId: {
+      type: String,
+      trim: true,
+    },
+    paypalCaptureId: {
+      type: String,
+      trim: true,
+    },
+    nextBillingDate: {
+      type: Date,
+    },
   },
   {
     timestamps: true,

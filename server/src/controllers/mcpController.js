@@ -42,12 +42,18 @@ export class McpController {
 
   static async chat(req, res, next) {
     try {
-      const { message, history } = req.body;
+      const { message, history, context = {}, role, clientEmail } = req.body;
       if (!message || !message.trim()) {
         return res.status(400).json({ error: 'Message cannot be empty' });
       }
 
-      const response = await McpService.chat(message, history || []);
+      const mergedContext = {
+        ...context,
+        ...(role ? { role } : {}),
+        ...(clientEmail ? { clientEmail } : {}),
+      };
+
+      const response = await McpService.chat(message, history || [], mergedContext);
       res.json(response);
     } catch (err) {
       next(err);

@@ -11,6 +11,11 @@ import paymentRoutes from './routes/paymentRoutes.js';
 import businessRoutes from './routes/businessRoutes.js';
 import paypalRoutes from './routes/paypalRoutes.js';
 import mcpRoutes from './routes/mcpRoutes.js';
+import serviceRequestRoutes from './routes/serviceRequestRoutes.js';
+import forecastRoutes from './routes/forecastRoutes.js';
+import productRoutes from './routes/productRoutes.js';
+import orderRoutes from './routes/orderRoutes.js';
+import spendingRoutes from './routes/spendingRoutes.js';
 
 dotenv.config();
 
@@ -75,6 +80,11 @@ app.use('/api/payments', paymentRoutes);
 app.use('/api/business', businessRoutes);
 app.use('/api/paypal', paypalRoutes);
 app.use('/api/mcp', mcpRoutes);
+app.use('/api/service-requests', serviceRequestRoutes);
+app.use('/api/forecast', forecastRoutes);
+app.use('/api/products', productRoutes);
+app.use('/api/orders', orderRoutes);
+app.use('/api/spending', spendingRoutes);
 
 // 404 Handler
 app.use((req, res) => {

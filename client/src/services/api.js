@@ -147,6 +147,60 @@ export const capturePayPalOrder = async (orderId, invoiceId) => {
   return res.data;
 };
 
+// Subscriptions / Expense PayPal Orders (Canva, Figma, AWS, Adobe)
+export const createExpensePayPalOrder = async (expenseId) => {
+  const res = await api.post('/paypal/create-expense-order', { expenseId });
+  return res.data;
+};
+
+export const captureExpensePayPalOrder = async (orderId, expenseId) => {
+  const res = await api.post('/paypal/capture-expense-order', { orderId, expenseId });
+  return res.data;
+};
+
+// Service Request PayPal Orders
+export const createServicePayPalOrder = async (serviceRequestId) => {
+  const res = await api.post('/paypal/create-service-order', { serviceRequestId });
+  return res.data;
+};
+
+export const captureServicePayPalOrder = async (orderId, serviceRequestId) => {
+  const res = await api.post('/paypal/capture-service-order', { orderId, serviceRequestId });
+  return res.data;
+};
+
+// Client Service Requests API
+export const getServiceRequests = async (email = '', status = '') => {
+  const params = {};
+  if (email) params.email = email;
+  if (status) params.status = status;
+  const res = await api.get('/service-requests', { params });
+  return res.data || [];
+};
+
+export const createServiceRequest = async (requestData) => {
+  const res = await api.post('/service-requests', requestData);
+  return res.data;
+};
+
+export const updateServiceRequestStatus = async (id, status) => {
+  const res = await api.patch(`/service-requests/${id}/status`, { status });
+  return res.data;
+};
+
+export const convertServiceRequestToInvoice = async (id) => {
+  const res = await api.post(`/service-requests/${id}/convert-to-invoice`);
+  return res.data;
+};
+
+// Financial Forecast & Runway API (6-month and 12-month)
+export const getFinancialForecast = async (horizon = 12, scenario = 'baseline') => {
+  const res = await api.get('/forecast', {
+    params: { horizon, scenario },
+  });
+  return res.data;
+};
+
 // PayPal Remote MCP Server & AI Assistant API
 export const getMcpStatus = async () => {
   const res = await api.get('/mcp/status');
@@ -163,10 +217,80 @@ export const callMcpTool = async (tool, args = {}) => {
   return res.data;
 };
 
-export const chatWithMcp = async (message, history = []) => {
-  const res = await api.post('/mcp/chat', { message, history });
+export const chatWithMcp = async (message, history = [], context = {}) => {
+  const res = await api.post('/mcp/chat', { message, history, context });
+  return res.data;
+};
+
+// Products API
+export const getProducts = async (params = {}) => {
+  const res = await api.get('/products', { params });
+  return res.data || [];
+};
+
+export const getProductById = async (id) => {
+  const res = await api.get(`/products/${id}`);
+  return res.data;
+};
+
+export const createProduct = async (productData) => {
+  const res = await api.post('/products', productData);
+  return res.data;
+};
+
+export const updateProduct = async (id, productData) => {
+  const res = await api.put(`/products/${id}`, productData);
+  return res.data;
+};
+
+export const deleteProduct = async (id) => {
+  const res = await api.delete(`/products/${id}`);
+  return res.data;
+};
+
+// Orders API
+export const getOrders = async (params = {}) => {
+  const res = await api.get('/orders', { params });
+  return res.data || [];
+};
+
+export const getOrderById = async (id) => {
+  const res = await api.get(`/orders/${id}`);
+  return res.data;
+};
+
+export const createOrder = async (orderData) => {
+  const res = await api.post('/orders', orderData);
+  return res.data;
+};
+
+export const completeOrderPayment = async (id, paymentData) => {
+  const res = await api.post(`/orders/${id}/complete`, paymentData);
+  return res.data;
+};
+
+export const updateOrderFulfillment = async (id, fulfillmentStatus) => {
+  const res = await api.patch(`/orders/${id}/fulfillment`, { fulfillmentStatus });
+  return res.data;
+};
+
+// Customer Monthly Spending & Ledger API
+export const getCustomerSpending = async (customerEmail) => {
+  const res = await api.get('/spending', { params: { customerEmail } });
+  return res.data;
+};
+
+export const updateSpendingSettings = async (settingsData) => {
+  const res = await api.put('/spending/settings', settingsData);
+  return res.data;
+};
+
+export const topUpAllowance = async (topUpData) => {
+  const res = await api.post('/spending/top-up', topUpData);
   return res.data;
 };
 
 export default api;
+
+
 

@@ -80,7 +80,19 @@ export class PayPalService {
    * Creates a PayPal order for an invoice
    * Never trusts frontend amounts; caller must provide verified server-side amountInCents
    */
-  static async createOrder({ invoiceId, amountInCents, currency = 'USD', invoiceNumber, customerEmail }) {
+  static async createOrder({
+    invoiceId,
+    expenseId,
+    serviceRequestId,
+    referenceId,
+    amountInCents,
+    currency = 'USD',
+    invoiceNumber,
+    customerEmail,
+    description,
+    returnUrl,
+    cancelUrl,
+  }) {
     if (!amountInCents || amountInCents <= 0) {
       const err = new Error('Invalid order amount. Amount must be greater than zero.');
       err.status = 400;
@@ -91,14 +103,23 @@ export class PayPalService {
     const baseUrl = this.getBaseUrl();
     const formattedAmount = toPayPalAmountString(amountInCents);
 
+    const refId = String(referenceId || invoiceId || expenseId || serviceRequestId || 'ORDER');
+    const orderDescription =
+      description ||
+      (invoiceNumber
+        ? `CashFlow Copilot - Invoice ${invoiceNumber}`
+        : `CashFlow Copilot - Payment for ${refId}`);
+
+    const clientBase = process.env.CLIENT_URL || 'http://localhost:5173';
+
     const payload = {
       intent: 'CAPTURE',
       purchase_units: [
         {
-          reference_id: String(invoiceId),
-          custom_id: String(invoiceId),
+          reference_id: refId,
+          custom_id: refId,
           invoice_id: invoiceNumber || undefined,
-          description: `CashFlow Copilot - Invoice ${invoiceNumber || invoiceId}`,
+          description: orderDescription.slice(0, 127),
           amount: {
             currency_code: currency,
             value: formattedAmount,
@@ -109,8 +130,8 @@ export class PayPalService {
         brand_name: 'CashFlow Copilot',
         landing_page: 'NO_PREFERENCE',
         user_action: 'PAY_NOW',
-        return_url: `${process.env.CLIENT_URL || 'http://localhost:5173'}/invoices`,
-        cancel_url: `${process.env.CLIENT_URL || 'http://localhost:5173'}/invoices`,
+        return_url: returnUrl || `${clientBase}/invoices`,
+        cancel_url: cancelUrl || `${clientBase}/invoices`,
       },
     };
 
