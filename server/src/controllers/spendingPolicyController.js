@@ -1,5 +1,6 @@
 import { SpendingPolicyEngine } from '../services/spendingPolicyEngine.js';
 import { CustomerPolicy, ApprovalRequest, User } from '../models/index.js';
+import { CustomerForecastEngine } from '../services/customerForecastEngine.js';
 
 export class SpendingPolicyController {
   // Get active customer policy and current spending
@@ -140,6 +141,74 @@ export class SpendingPolicyController {
       res.json(result);
     } catch (err) {
       res.status(400).json({ error: err.message });
+    }
+  }
+
+  // Cashflow Forecast & Burn Rate (Prompt 10)
+  static async getForecast(req, res, next) {
+    try {
+      const customerEmail = req.user?.email || 'sarah.j@gmail.com';
+      let resolvedUserId = req.user?._id;
+      if (!resolvedUserId) {
+        const user = await User.findOne({ email: customerEmail });
+        resolvedUserId = user?._id;
+      }
+
+      const forecast = await CustomerForecastEngine.calculateForecast(resolvedUserId);
+      res.json(forecast);
+    } catch (err) {
+      next(err);
+    }
+  }
+
+  // Trigger recurring or manual allowance top-up (Prompt 10)
+  static async triggerRecurringTopUp(req, res, next) {
+    try {
+      const customerEmail = req.user?.email || 'sarah.j@gmail.com';
+      let resolvedUserId = req.user?._id;
+      if (!resolvedUserId) {
+        const user = await User.findOne({ email: customerEmail });
+        resolvedUserId = user?._id;
+      }
+
+      const { amountCents } = req.body;
+      const result = await CustomerForecastEngine.processTopUp({
+        customerId: resolvedUserId,
+        amountCents: amountCents ? Number(amountCents) : undefined,
+      });
+
+      res.json(result);
+    } catch (err) {
+      next(err);
+    }
+  }
+
+  // Update recurring schedule configuration (Prompt 10)
+  static async updateRecurringSchedule(req, res, next) {
+    try {
+      const customerEmail = req.user?.email || 'sarah.j@gmail.com';
+      let resolvedUserId = req.user?._id;
+      if (!resolvedUserId) {
+        const user = await User.findOne({ email: customerEmail });
+        resolvedUserId = user?._id;
+      }
+
+      const policy = await SpendingPolicyEngine.getOrCreatePolicy(resolvedUserId, customerEmail);
+      const { enabled, cadence, amountCents } = req.body;
+
+      if (enabled !== undefined) policy.recurringTopUp.enabled = Boolean(enabled);
+      if (cadence !== undefined) policy.recurringTopUp.cadence = cadence;
+      if (amountCents !== undefined) policy.recurringTopUp.amountCents = Number(amountCents);
+
+      if (policy.recurringTopUp.enabled && !policy.recurringTopUp.nextRunDate) {
+        const days = policy.recurringTopUp.cadence === 'weekly' ? 7 : 30;
+        policy.recurringTopUp.nextRunDate = new Date(Date.now() + days * 24 * 60 * 60 * 1000);
+      }
+
+      await policy.save();
+      res.json({ success: true, recurringTopUp: policy.recurringTopUp });
+    } catch (err) {
+      next(err);
     }
   }
 }

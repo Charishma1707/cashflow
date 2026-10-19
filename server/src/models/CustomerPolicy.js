@@ -49,6 +49,19 @@ const CustomerPolicySchema = new mongoose.Schema(
       type: Boolean,
       default: false, // Instant global kill switch
     },
+    recurringTopUp: {
+      enabled: { type: Boolean, default: false },
+      cadence: { type: String, enum: ['weekly', 'monthly'], default: 'monthly' },
+      amountCents: { type: Number, default: 0 },
+      nextRunDate: { type: Date },
+      lastRunDate: { type: Date },
+      vaultTokenId: { type: String, default: '' },
+    },
+    topUpBalanceCents: {
+      type: Number,
+      default: 0,
+      min: 0,
+    },
   },
   {
     timestamps: true,

@@ -19,4 +19,9 @@ router.get('/approvals', SpendingPolicyController.listApprovals);
 router.post('/approvals/:id/decide', SpendingPolicyController.decideApproval);
 router.post('/approvals/:id/execute', SpendingPolicyController.executeApproval);
 
+// Forecasting & Recurring Top-Up (Prompt 10)
+router.get('/forecast', SpendingPolicyController.getForecast);
+router.post('/recurring-topup', SpendingPolicyController.triggerRecurringTopUp);
+router.put('/recurring-schedule', SpendingPolicyController.updateRecurringSchedule);
+
 export default router;
