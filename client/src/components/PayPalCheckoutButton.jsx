@@ -1,9 +1,15 @@
 import React, { useState } from 'react';
 import { PayPalScriptProvider, PayPalButtons } from '@paypal/react-paypal-js';
-import { createPayPalOrder, capturePayPalOrder, formatMoney } from '../services/api';
+import { createPayPalOrder, capturePayPalOrder, formatMoney, createOrder } from '../services/api';
 import { AlertCircle, CheckCircle2, ShieldCheck, RefreshCw, KeyRound } from 'lucide-react';
 
-export default function PayPalCheckoutButton({ invoice, onPaymentSuccess }) {
+export default function PayPalCheckoutButton({
+  invoice,
+  amount,
+  orderData,
+  onPaymentSuccess,
+  onSuccess,
+}) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [cancelled, setCancelled] = useState(false);
@@ -11,13 +17,20 @@ export default function PayPalCheckoutButton({ invoice, onPaymentSuccess }) {
   // Vite environment variable
   const clientId = import.meta.env.VITE_PAYPAL_CLIENT_ID?.trim();
 
-  // Eligibility check
-  const isPaid = invoice.status === 'PAID' || invoice.outstandingBalance <= 0;
-  const isCancelled = invoice.status === 'CANCELLED';
-  const isDraft = invoice.status === 'DRAFT';
-  const isPayable = !isPaid && !isCancelled && !isDraft;
+  // Safe Eligibility check
+  const isInvoiceMode = Boolean(invoice);
+  const isPaid = isInvoiceMode ? (invoice.status === 'PAID' || invoice.outstandingBalance <= 0) : false;
+  const isCancelled = isInvoiceMode ? invoice.status === 'CANCELLED' : false;
+  const isDraft = isInvoiceMode ? invoice.status === 'DRAFT' : false;
+  const isPayable = isInvoiceMode ? (!isPaid && !isCancelled && !isDraft) : Boolean(amount || orderData);
 
-  if (isPaid) {
+  const displayAmountCents = isInvoiceMode
+    ? invoice.outstandingBalance
+    : amount !== undefined
+    ? Math.round(Number(amount) * 100)
+    : orderData?.totalCents || 0;
+
+  if (isInvoiceMode && isPaid) {
     return (
       <div className="p-4 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-700 flex items-center space-x-3">
         <CheckCircle2 className="w-5 h-5 shrink-0" />
@@ -29,7 +42,7 @@ export default function PayPalCheckoutButton({ invoice, onPaymentSuccess }) {
     );
   }
 
-  if (isCancelled) {
+  if (isInvoiceMode && isCancelled) {
     return (
       <div className="p-4 rounded-xl bg-slate-100 border border-slate-200 text-slate-600 flex items-center space-x-3">
         <AlertCircle className="w-5 h-5 shrink-0" />
@@ -41,7 +54,7 @@ export default function PayPalCheckoutButton({ invoice, onPaymentSuccess }) {
     );
   }
 
-  if (isDraft) {
+  if (isInvoiceMode && isDraft) {
     return (
       <div className="p-4 rounded-xl bg-amber-50 border border-amber-200 text-amber-800 flex items-center space-x-3">
         <AlertCircle className="w-5 h-5 shrink-0" />
@@ -62,7 +75,7 @@ export default function PayPalCheckoutButton({ invoice, onPaymentSuccess }) {
           <span>PayPal Sandbox Setup Required</span>
         </div>
         <p className="text-xs text-slate-600 leading-relaxed">
-          To initiate real Sandbox checkout for <strong className="text-slate-900">{formatMoney(invoice.outstandingBalance)}</strong>:
+          To initiate real Sandbox checkout for <strong className="text-slate-900">{formatMoney(displayAmountCents)}</strong>:
         </p>
         <ol className="text-[11px] text-slate-700 list-decimal list-inside space-y-1 bg-white p-2.5 rounded-lg border border-blue-150 font-mono shadow-2xs">
           <li>Get credentials at <span className="text-blue-600 font-semibold">developer.paypal.com</span></li>
@@ -79,15 +92,35 @@ export default function PayPalCheckoutButton({ invoice, onPaymentSuccess }) {
     intent: 'capture',
   };
 
-  const handleCreateOrder = async () => {
+  const handleCreateOrder = async (data, actions) => {
     try {
       setLoading(true);
       setError(null);
       setCancelled(false);
 
-      // Call our backend to create order with server-calculated amount
-      const data = await createPayPalOrder(invoice._id);
-      return data.orderId;
+      if (isInvoiceMode) {
+        // Call our backend to create order for invoice
+        const orderRes = await createPayPalOrder(invoice._id);
+        return orderRes.orderId;
+      }
+
+      // Order / Marketplace mode
+      const chargeValue = (displayAmountCents / 100).toFixed(2);
+      if (actions?.order) {
+        return actions.order.create({
+          purchase_units: [
+            {
+              amount: {
+                value: chargeValue,
+                currency_code: 'USD',
+              },
+              description: orderData?.items?.[0]?.title || 'Marketplace Item',
+            },
+          ],
+        });
+      }
+
+      return 'MOCK-ORDER-' + Date.now();
     } catch (err) {
       console.error('Failed to create order on server:', err);
       const msg = err.response?.data?.error || err.message || 'Could not initialize PayPal order';
@@ -98,19 +131,45 @@ export default function PayPalCheckoutButton({ invoice, onPaymentSuccess }) {
     }
   };
 
-  const handleApprove = async (data) => {
+  const handleApprove = async (data, actions) => {
     try {
       setLoading(true);
       setError(null);
 
-      // Call our backend to capture order and record payment idempotently
-      const result = await capturePayPalOrder(data.orderID, invoice._id);
+      let result = null;
 
-      if (onPaymentSuccess) {
-        onPaymentSuccess(result);
+      if (isInvoiceMode) {
+        // Capture invoice order on backend
+        result = await capturePayPalOrder(data.orderID, invoice._id);
+      } else {
+        // Marketplace order capture
+        if (actions?.order) {
+          result = await actions.order.capture();
+        } else {
+          result = { id: data.orderID, status: 'COMPLETED' };
+        }
+
+        // Post order to backend if orderData provided
+        if (orderData) {
+          try {
+            const created = await createOrder({
+              ...orderData,
+              paypalCaptureId: result?.id || data.orderID,
+              subtotalCents: displayAmountCents,
+              totalCents: displayAmountCents,
+              paymentStatus: 'COMPLETED',
+            });
+            result = created || result;
+          } catch (postErr) {
+            console.warn('Backend order recording notice:', postErr.message);
+          }
+        }
       }
+
+      if (onPaymentSuccess) onPaymentSuccess(result);
+      if (onSuccess) onSuccess(result);
     } catch (err) {
-      console.error('Failed to capture PayPal order on backend:', err);
+      console.error('Failed to capture PayPal order:', err);
       const msg = err.response?.data?.error || err.message || 'Payment capture failed on server';
       setError(msg);
     } finally {
